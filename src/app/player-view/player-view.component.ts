@@ -100,7 +100,7 @@ export class PlayerViewComponent implements OnInit {
     let currentPos = this.trackServer.playbackQueue.findIndex((element) => {
       return element === this.trackServer.nowPlaying;
     });
-    if (currentPos !== -1 && currentPos !== this.trackServer.playbackQueue.length) {
+    if (currentPos !== -1 && currentPos !== this.trackServer.playbackQueue.length - 1) {
       this.trackServer.nowPlaying = this.trackServer.playbackQueue[currentPos + 1];
       this.trackServer.trackAlert.emit();
     }
@@ -117,12 +117,11 @@ export class PlayerViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // TODO: WRAP IN A FUNCTION AND APPLY TO ALL EVENTS
     this.trackServer.trackAlert.subscribe((event) => {
       this.nowPlayingUrl = this.testUrl + "/tracks/" + encodeURIComponent(this.trackServer.nowPlaying);
       console.log("New track:", this.nowPlayingUrl);
       const audioElement = this.audioElement.nativeElement;
-      // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A FEW OF CLICKS
+      // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A FEW CLICKS
       audioElement.addEventListener('canplay', (event: Event) => {
         audioElement.play()
       });

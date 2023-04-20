@@ -11,6 +11,11 @@ export class PlaybackQueueComponent implements OnInit {
 
   playbackQueue: string[] = [];
 
+  selectTrack(fileName: string): void {
+    this.trackService.nowPlaying = fileName;
+    this.trackService.trackAlert.emit();
+  }
+
   ngOnInit(): void {
     // TODO: BORROWS FROM THE COLLECTION ON FIRST PLAY, REFACTOR LATER
     this.trackService.queueAlert.subscribe((event) => {

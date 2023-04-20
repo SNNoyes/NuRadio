@@ -1,0 +1,7 @@
+<h2>My collection</h2>
+<ul>
+  <li class="track" *ngFor="let track of collection" (click)="selectTrack(track)">
+    <p>{{track}}</p>
+  </li>
+</ul>
+<button type="button" (click)="refreshCollection()">Refresh</button>

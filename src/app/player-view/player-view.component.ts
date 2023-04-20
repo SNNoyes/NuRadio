@@ -1,14 +1,16 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 // jsmediatags IS A LIBRARY THAT READS MEDIA TAGS
 import * as jsmediatags from 'jsmediatags';
-import { PictureType } from 'jsmediatags/types';
+import { TrackServerService } from '../track-server.service';
 
 @Component({
   selector: 'app-player-view',
   templateUrl: './player-view.component.html',
   styleUrls: ['./player-view.component.css']
 })
-export class PlayerViewComponent {
+export class PlayerViewComponent implements OnInit {
+  constructor(private trackServer: TrackServerService) { }
+
   // ViewChild and ElementRef ARE AN ANGULAR WAYS TO WRAP AND REFER TO DOM ELEMENTS
   // USING DOM SELECTORS DIRECTLY IS NOT FOR ANGULAR
   @ViewChild("audio") audioElement!: ElementRef;
@@ -19,23 +21,38 @@ export class PlayerViewComponent {
   playing: boolean = false;
   duration: string = "0:00";
   currentTime: string = "0:00";
+  testUrl: string = "http://localhost:3456";
+  nowPlayingUrl: string = "";
 
   info = {
-    artist: "" as string,
-    title: "" as string
+    artist: "Artist" as string,
+    title: "Title" as string
   };
 
   // REFERRING TO THE ELEMENTS IN THE HANDLERS TO MAKE SURE THEY ARE INITIALIZED AND NOT NULL
   playPause(event: Event): void {
     const audioElement = this.audioElement.nativeElement;
-    if (this.playing === false) {
+    if (audioElement.paused === true) {
       audioElement.play();
-      this.playing = true;
-    } else if (this.playing === true) {
+    } else {
       audioElement.pause();
-      this.playing = false;
     };
   };
+
+  // playPause(event: Event): void {
+  //   const audioElement = this.audioElement.nativeElement;
+  //   if (this.playing === false) {
+  //     // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A NUMBER OF CLICKS
+  //     audioElement.addEventListener('canplay', () => { 
+  //       audioElement.play()
+  //       this.playing == true;
+  //     })
+  //     this.playing = true;
+  //   } else if (this.playing === true) {
+  //     audioElement.pause();
+  //     this.playing = false;
+  //   };
+  // };
 
   changeVolume(): void {
     const volumeControl = this.volumeControl.nativeElement;
@@ -94,6 +111,19 @@ export class PlayerViewComponent {
     let seconds = totalSeconds % 60;
     return `${minutes}:${(seconds % 60).toString().padStart(2, "0")}`;
   }
+
+  ngOnInit(): void {
+    this.trackServer.trackAlert.subscribe((event) => {
+      this.nowPlayingUrl = this.testUrl + "/tracks/" + encodeURIComponent(this.trackServer.nowPlaying);
+      console.log("New track:", this.nowPlayingUrl);
+      const audioElement = this.audioElement.nativeElement;
+      // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A NUMBER OF CLICKS
+      audioElement.addEventListener('canplay', (event: Event) => {
+        audioElement.play()
+      });
+    })
+  }
+
 }
 
 

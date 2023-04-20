@@ -1,0 +1,14 @@
+ul {
+  list-style-type: none;
+  padding-left: 0px;
+}
+
+li {
+  display: flex;
+  flex-direction: row;
+}
+
+.playing {
+  background-color: black;
+  color: white;
+}

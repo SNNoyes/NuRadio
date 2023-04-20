@@ -18,7 +18,6 @@ export class PlayerViewComponent implements OnInit {
   @ViewChild("progressBar") progressBar!: ElementRef;
   @ViewChild("cover") coverArt!: ElementRef;
 
-  playing: boolean = false;
   duration: string = "0:00";
   currentTime: string = "0:00";
   testUrl: string = "http://localhost:3456";
@@ -38,21 +37,6 @@ export class PlayerViewComponent implements OnInit {
       audioElement.pause();
     };
   };
-
-  // playPause(event: Event): void {
-  //   const audioElement = this.audioElement.nativeElement;
-  //   if (this.playing === false) {
-  //     // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A NUMBER OF CLICKS
-  //     audioElement.addEventListener('canplay', () => { 
-  //       audioElement.play()
-  //       this.playing == true;
-  //     })
-  //     this.playing = true;
-  //   } else if (this.playing === true) {
-  //     audioElement.pause();
-  //     this.playing = false;
-  //   };
-  // };
 
   changeVolume(): void {
     const volumeControl = this.volumeControl.nativeElement;
@@ -112,12 +96,33 @@ export class PlayerViewComponent implements OnInit {
     return `${minutes}:${(seconds % 60).toString().padStart(2, "0")}`;
   }
 
+  nextTrack(): void {
+    let currentPos = this.trackServer.playbackQueue.findIndex((element) => {
+      return element === this.trackServer.nowPlaying;
+    });
+    if (currentPos !== -1 && currentPos !== this.trackServer.playbackQueue.length) {
+      this.trackServer.nowPlaying = this.trackServer.playbackQueue[currentPos + 1];
+      this.trackServer.trackAlert.emit();
+    }
+  }
+
+  previousTrack(): void {
+    let currentPos = this.trackServer.playbackQueue.findIndex((element) => {
+      return element === this.trackServer.nowPlaying;
+    });
+    if (currentPos !== -1 && currentPos !== 0) {
+      this.trackServer.nowPlaying = this.trackServer.playbackQueue[currentPos - 1];
+      this.trackServer.trackAlert.emit();
+    }
+  }
+
   ngOnInit(): void {
+    // TODO: WRAP IN A FUNCTION AND APPLY TO ALL EVENTS
     this.trackServer.trackAlert.subscribe((event) => {
       this.nowPlayingUrl = this.testUrl + "/tracks/" + encodeURIComponent(this.trackServer.nowPlaying);
       console.log("New track:", this.nowPlayingUrl);
       const audioElement = this.audioElement.nativeElement;
-      // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A NUMBER OF CLICKS
+      // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A FEW OF CLICKS
       audioElement.addEventListener('canplay', (event: Event) => {
         audioElement.play()
       });
@@ -126,7 +131,7 @@ export class PlayerViewComponent implements OnInit {
 
 }
 
-
+  // playing: boolean = false;
 
   // audio(): void {
   //   const audioContext = new AudioContext();
@@ -176,3 +181,18 @@ export class PlayerViewComponent implements OnInit {
 
 // CAN REFACTOR BASED ON HTML MEDIA ELEMENT PROPERTIES https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
 // AUDIO NODES ALLOW PROCESSING, MAY NEED THEM LATER FOR FADE OUT AND MIXING
+
+  // playPause(event: Event): void {
+  //   const audioElement = this.audioElement.nativeElement;
+  //   if (this.playing === false) {
+  //     // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A NUMBER OF CLICKS
+  //     audioElement.addEventListener('canplay', () => { 
+  //       audioElement.play()
+  //       this.playing == true;
+  //     })
+  //     this.playing = true;
+  //   } else if (this.playing === true) {
+  //     audioElement.pause();
+  //     this.playing = false;
+  //   };
+  // };

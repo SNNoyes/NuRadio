@@ -13,7 +13,12 @@ export class CollectionViewComponent implements OnInit {
 
   selectTrack(fileName: string): void {
     this.trackService.nowPlaying = fileName;
+    // SET QUEUE TO MATCH THE COLLECTION, TO BE REFACTORED LATER
+    if (this.trackService.playbackQueue.length === 0) {
+      this.trackService.playbackQueue = this.collection;
+    }
     this.trackService.trackAlert.emit();
+    this.trackService.queueAlert.emit();
   }
 
   refreshCollection(): void {
@@ -29,6 +34,7 @@ export class CollectionViewComponent implements OnInit {
       .subscribe((response) => {
         console.log(response);
         this.collection = response;
+        this.trackService.collection = this.collection;
       })
   }
   

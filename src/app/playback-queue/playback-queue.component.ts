@@ -7,9 +7,17 @@ import { TrackServerService } from '../track-server.service';
   styleUrls: ['./playback-queue.component.css']
 })
 export class PlaybackQueueComponent implements OnInit {
-  constructor(private trackService: TrackServerService) {};
+  constructor(public trackService: TrackServerService) {};
+
+  playbackQueue: string[] = [];
 
   ngOnInit(): void {
-  
+    // TODO: BORROWS FROM THE COLLECTION ON FIRST PLAY, REFACTOR LATER
+    this.trackService.queueAlert.subscribe((event) => {
+      if (this.playbackQueue.length === 0) {
+        this.playbackQueue = this.trackService.playbackQueue;
+        console.log(this.playbackQueue);
+      }
+    })
   }
 }

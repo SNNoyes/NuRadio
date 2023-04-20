@@ -9,10 +9,13 @@ export class TrackServerService {
   constructor(private http: HttpClient) { }
 
   nowPlaying: string = "";
+  collection: string[] = [];
+  playbackQueue: string[] = [];
 
   testUrl: string = "http://localhost:3456";
 
   trackAlert = new EventEmitter();
+  queueAlert = new EventEmitter();
 
   getCollection(): Observable<string[]> {
     return this.http.get<string[]>(this.testUrl + "/tracks", {
@@ -21,5 +24,4 @@ export class TrackServerService {
       }
     });
   }
-
 }

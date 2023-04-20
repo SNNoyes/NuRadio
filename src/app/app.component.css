@@ -6,6 +6,7 @@
 app-collection-view {
   width: 300px;
   border: 1px solid black;
+  padding: 5px;
 }
 
 app-player-view {
@@ -14,9 +15,11 @@ app-player-view {
   align-items: center;
   width: 300px;
   border: 1px solid black;
+  padding: 5px;
 }
 
 app-playback-queue {
   width: 300px;
   border: 1px solid black;
+  padding: 5px;
 }

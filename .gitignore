@@ -39,6 +39,7 @@ testem.log
 /src/assets/mocks
 /mock_server/mocks
 /mock_server/node_modules
+/src/env.ts
 
 # System files
 .DS_Store

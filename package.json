@@ -27,6 +27,8 @@
     "@angular/platform-browser": "^15.2.0",
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
+    "@googleapis/drive": "^5.0.2",
+    "@types/gapi.auth2": "^0.0.57",
     "jsmediatags": "^3.9.7",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

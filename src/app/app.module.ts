@@ -12,6 +12,7 @@ import { PlaybackQueueComponent } from './playback-queue/playback-queue.componen
 import { GoogleTestComponent } from './google-test/google-test.component';
 import { SocialLoginModule, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
+import { CLIENT_ID, API_KEY } from 'src/env';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
           {
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(
-              '935582687528-bi0hs0toku3sk165t1ctrb7dls938aat.apps.googleusercontent.com'
+              CLIENT_ID, 
+              { scopes: ["https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/drive.metadata"]}
             )
           }
         ],

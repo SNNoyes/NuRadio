@@ -11,6 +11,7 @@ export class TrackServerService {
   nowPlaying: string = "";
   collection: string[] = [];
   playbackQueue: string[] = [];
+  accessToken: string = "";
 
   testUrl: string = "http://localhost:3456";
 

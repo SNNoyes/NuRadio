@@ -13,6 +13,9 @@ import { GoogleTestComponent } from './google-test/google-test.component';
 import { SocialLoginModule, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { CLIENT_ID, API_KEY } from 'src/env';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { LoginComponent } from './login/login.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +23,10 @@ import { CLIENT_ID, API_KEY } from 'src/env';
     PlayerViewComponent,
     CollectionViewComponent,
     PlaybackQueueComponent,
-    GoogleTestComponent
+    GoogleTestComponent,
+    DashboardComponent,
+    LoginComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -39,7 +45,8 @@ import { CLIENT_ID, API_KEY } from 'src/env';
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(
               CLIENT_ID, 
-              { scopes: ["https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/drive.metadata"]}
+              { oneTapEnabled: true,
+                scopes: ["https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/drive.metadata"]}
             )
           }
         ],

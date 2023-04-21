@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CollectionViewComponent } from './collection-view.component';
+import { CurrentDirComponent } from './current-dir.component';
 
-describe('CollectionViewComponent', () => {
-  let component: CollectionViewComponent;
-  let fixture: ComponentFixture<CollectionViewComponent>;
+describe('CurrentDirComponent', () => {
+  let component: CurrentDirComponent;
+  let fixture: ComponentFixture<CurrentDirComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CollectionViewComponent ]
+      declarations: [ CurrentDirComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CollectionViewComponent);
+    fixture = TestBed.createComponent(CurrentDirComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayerViewComponent } from './player-view/player-view.component';
-import { CollectionViewComponent } from './collection-view/collection-view.component';
+import { CurrentDirComponent } from './current-dir/current-dir.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { PlaybackQueueComponent } from './playback-queue/playback-queue.component';
@@ -21,7 +21,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
   declarations: [
     AppComponent,
     PlayerViewComponent,
-    CollectionViewComponent,
+    CurrentDirComponent,
     PlaybackQueueComponent,
     GoogleTestComponent,
     DashboardComponent,

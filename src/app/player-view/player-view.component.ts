@@ -9,7 +9,7 @@ import { TrackServerService } from '../track-server.service';
   styleUrls: ['./player-view.component.css']
 })
 export class PlayerViewComponent implements OnInit {
-  constructor(private trackServer: TrackServerService) { }
+  constructor(private trackService: TrackServerService) { }
 
   // ViewChild and ElementRef ARE AN ANGULAR WAYS TO WRAP AND REFER TO DOM ELEMENTS
   // USING DOM SELECTORS DIRECTLY IS NOT FOR ANGULAR
@@ -97,28 +97,28 @@ export class PlayerViewComponent implements OnInit {
   }
 
   nextTrack(): void {
-    let currentPos = this.trackServer.playbackQueue.findIndex((element) => {
-      return element === this.trackServer.nowPlaying;
+    let currentPos = this.trackService.playbackQueue.findIndex((element) => {
+      return element === this.trackService.nowPlaying;
     });
-    if (currentPos !== -1 && currentPos !== this.trackServer.playbackQueue.length - 1) {
-      this.trackServer.nowPlaying = this.trackServer.playbackQueue[currentPos + 1];
-      this.trackServer.trackAlert.emit();
+    if (currentPos !== -1 && currentPos !== this.trackService.playbackQueue.length - 1) {
+      this.trackService.nowPlaying = this.trackService.playbackQueue[currentPos + 1];
+      this.trackService.trackAlert.emit();
     }
   }
 
   previousTrack(): void {
-    let currentPos = this.trackServer.playbackQueue.findIndex((element) => {
-      return element === this.trackServer.nowPlaying;
+    let currentPos = this.trackService.playbackQueue.findIndex((element) => {
+      return element === this.trackService.nowPlaying;
     });
     if (currentPos !== -1 && currentPos !== 0) {
-      this.trackServer.nowPlaying = this.trackServer.playbackQueue[currentPos - 1];
-      this.trackServer.trackAlert.emit();
+      this.trackService.nowPlaying = this.trackService.playbackQueue[currentPos - 1];
+      this.trackService.trackAlert.emit();
     }
   }
 
   ngOnInit(): void {
-    this.trackServer.trackAlert.subscribe((event) => {
-      this.nowPlayingUrl = this.testUrl + "/tracks/" + encodeURIComponent(this.trackServer.nowPlaying);
+    this.trackService.trackAlert.subscribe((event) => {
+      this.nowPlayingUrl = this.testUrl + "/tracks/" + encodeURIComponent(this.trackService.nowPlaying);
       console.log("New track:", this.nowPlayingUrl);
       const audioElement = this.audioElement.nativeElement;
       // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A FEW CLICKS

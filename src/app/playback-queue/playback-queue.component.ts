@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TrackServerService } from '../track-server.service';
+import { Track } from '../track-server.service';
 
 @Component({
   selector: 'app-playback-queue',
@@ -7,22 +8,19 @@ import { TrackServerService } from '../track-server.service';
   styleUrls: ['./playback-queue.component.css']
 })
 export class PlaybackQueueComponent implements OnInit {
-  constructor(public trackService: TrackServerService) {};
+  constructor(public trackService: TrackServerService) { };
 
-  playbackQueue: string[] = [];
+  playbackQueue: Track[] = [];
 
-  selectTrack(fileName: string): void {
-    this.trackService.nowPlaying = fileName;
-    this.trackService.trackAlert.emit();
-  }
+  // selectTrack(fileName: string): void {
+  //   this.trackService.nowPlaying = fileName;
+  //   this.trackService.trackAlert.emit();
+  // }
 
   ngOnInit(): void {
-    // TODO: BORROWS FROM THE COLLECTION ON FIRST PLAY, REFACTOR LATER
     this.trackService.queueAlert.subscribe((event) => {
-      if (this.playbackQueue.length === 0) {
-        this.playbackQueue = this.trackService.playbackQueue;
-        console.log(this.playbackQueue);
-      }
+      this.playbackQueue = this.trackService.playbackQueue;
     })
   }
 }
+

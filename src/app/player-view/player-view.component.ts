@@ -2,6 +2,8 @@ import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 // jsmediatags IS A LIBRARY THAT READS MEDIA TAGS
 import * as jsmediatags from 'jsmediatags';
 import { TrackServerService } from '../track-server.service';
+import { Track } from '../track-server.service';
+import { API_KEY } from 'src/env';
 
 @Component({
   selector: 'app-player-view',
@@ -17,21 +19,55 @@ export class PlayerViewComponent implements OnInit {
   @ViewChild("volume") volumeControl!: ElementRef;
   @ViewChild("progressBar") progressBar!: ElementRef;
   @ViewChild("cover") coverArt!: ElementRef;
+  @ViewChild("source") sourceElement!: ElementRef;
 
   duration: string = "0:00";
   currentTime: string = "0:00";
-  testUrl: string = "http://localhost:3456";
   nowPlayingUrl: string = "";
+  queue = this.trackService.playbackQueue;
+  currentTrack: Track = {} as Track;
+
+  // MVP CODE FOR CUSTOM SERVER
+  // testUrl: string = "http://localhost:3456";
 
   info = {
     artist: "Artist" as string,
     title: "Title" as string
   };
 
+  // AUDIO ELEMENT CAN NOT FETCH TRACKS DIRECTLY BECAUSE IT DOES NOT SEND AUTH HEADERS
+  async fetchTrack(fileId: string): Promise<void> {
+    const audioSource = this.sourceElement.nativeElement;
+    // const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media`, {
+    const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media&key=${API_KEY}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+      }
+    });
+    // START DOWNLOADING FILE TO A BLOB, CREATE A TECHNICAL URL FOR THE BLOB AND GIVE IT
+    // TO THE AUDIO SOURCE ELEMENT
+    const blob = await result.blob();
+    if (blob) {
+      audioSource.src = URL.createObjectURL(blob);
+      // TODO: FIX LOAD ERROR OR HANDLE GOOGLE DRIVE THROTTLING (?)
+      audioSource.parentElement.load();
+    } else {
+      console.log("Failed to load from the remote source");
+    }
+  }
+
   // REFERRING TO THE ELEMENTS IN THE HANDLERS TO MAKE SURE THEY ARE INITIALIZED AND NOT NULL
-  playPause(event: Event): void {
+  playPause(event: Event): void | null {
+    if (this.queue.length === 0) return null;
     const audioElement = this.audioElement.nativeElement;
-    if (audioElement.paused === true) {
+    audioElement.addEventListener('canplay', (event: Event) => {
+      this.audioElement.nativeElement.play()
+    });
+    // PLAY FIRST TRACK FROM THE QUEUE IF NOTHING IS PLAYING
+    if (Object.keys(this.currentTrack).length === 0) {
+      this.fetchTrack(this.queue[0].id);
+      this.currentTrack = this.queue[0];
+    } else if (audioElement.paused === true) {
       audioElement.play();
     } else {
       audioElement.pause();
@@ -53,24 +89,25 @@ export class PlayerViewComponent implements OnInit {
     this.duration = this.parseTime(duration) as string;
     progressBar.max = duration;
 
-    jsmediatags.read(audioElement.src, {
-      onSuccess: (result) => {
-        console.log(result);
-        this.info.artist = result.tags.artist!;
-        this.info.title = result.tags.title!;
-        // APPARENTLY SOME FILES CONTAIN IMAGE DATA AS WELL
-        // PARSING BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
-        const { data, format } = result.tags.picture!;
-        let base64String = "";
-        for (let i = 0; i < data.length; i++) {
-          base64String += String.fromCharCode(data[i]);
-        }
-        coverArt.src = `data:${format};base64,${window.btoa(base64String)}`;
-      },
-      onError: (error) => {
-        console.error(error);
-      }
-    });
+    // LIBRARY STOPPED WORKING AFTER TRANSITION TO GOOGLE DRIVE
+    // jsmediatags.read(audioElement.source, {
+    //   onSuccess: (result) => {
+    //     console.log(result);
+    //     this.info.artist = result.tags.artist!;
+    //     this.info.title = result.tags.title!;
+    //     // APPARENTLY SOME FILES CONTAIN IMAGE DATA AS WELL
+    //     // PARSING BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
+    //     const { data, format } = result.tags.picture!;
+    //     let base64String = "";
+    //     for (let i = 0; i < data.length; i++) {
+    //       base64String += String.fromCharCode(data[i]);
+    //     }
+    //     coverArt.src = `data:${format};base64,${window.btoa(base64String)}`;
+    //   },
+    //   onError: (error) => {
+    //     console.error(error);
+    //   }
+    // });
   }
 
   updateTime(): void {
@@ -97,101 +134,34 @@ export class PlayerViewComponent implements OnInit {
   }
 
   nextTrack(): void {
-    let currentPos = this.trackService.playbackQueue.findIndex((element) => {
-      return element === this.trackService.nowPlaying;
+    let currentPos = this.trackService.playbackQueue.findIndex((element: Track) => {
+      return element.id === this.currentTrack.id;
     });
     if (currentPos !== -1 && currentPos !== this.trackService.playbackQueue.length - 1) {
-      this.trackService.nowPlaying = this.trackService.playbackQueue[currentPos + 1];
-      this.trackService.trackAlert.emit();
+      this.currentTrack = this.trackService.playbackQueue[currentPos + 1];
+      try {
+        this.fetchTrack(this.currentTrack.id);
+      } catch {
+        this.nextTrack();
+      }
     }
   }
 
   previousTrack(): void {
-    let currentPos = this.trackService.playbackQueue.findIndex((element) => {
-      return element === this.trackService.nowPlaying;
+    let currentPos = this.trackService.playbackQueue.findIndex((element: Track) => {
+      return element.id === this.currentTrack.id;
     });
     if (currentPos !== -1 && currentPos !== 0) {
-      this.trackService.nowPlaying = this.trackService.playbackQueue[currentPos - 1];
-      this.trackService.trackAlert.emit();
+      this.currentTrack = this.trackService.playbackQueue[currentPos - 1];
+      try {
+        this.fetchTrack(this.currentTrack.id);
+      } catch {
+        this.previousTrack();
+      }
     }
   }
 
   ngOnInit(): void {
-    this.trackService.trackAlert.subscribe((event) => {
-      this.nowPlayingUrl = this.testUrl + "/tracks/" + encodeURIComponent(this.trackService.nowPlaying);
-      console.log("New track:", this.nowPlayingUrl);
-      const audioElement = this.audioElement.nativeElement;
-      // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A FEW CLICKS
-      audioElement.addEventListener('canplay', (event: Event) => {
-        audioElement.play()
-      });
-    })
+
   }
-
 }
-
-  // playing: boolean = false;
-
-  // audio(): void {
-  //   const audioContext = new AudioContext();
-  //   // ! NON-NULL ASSERTION OPERATOR TELLS TS THAT THE VALUE WILL NEVER BE NULL
-  //   const audioElement = document.querySelector("audio")!;
-  //   const track = audioContext.createMediaElementSource(audioElement);
-  //   track.connect(audioContext.destination);
-
-  //   const playButton = document.querySelector("button")!;
-
-  //   playButton.addEventListener("click", function () {
-  //     if (audioContext.state === "suspended") {
-  //       audioContext.resume();
-  //     };
-
-  //     if (playButton.dataset["playing"] === "false") {
-  //       audioElement.play();
-  //       playButton.dataset["playing"] = "true";
-  //     } else if (playButton.dataset["playing"] === "true") {
-  //       audioElement.pause();
-  //       playButton.dataset["playing"] = "false";
-  //     };
-  //   });
-
-  //   audioElement.addEventListener("ended", function () {
-  //     playButton.dataset["playing"] = "false";
-  //   });
-
-  //   // CONFUSING EXAMPLE FROM MDN DOCS RE GAIN - IT ACTUALLY IS NOT VOLUME
-  //   const gainNode = audioContext.createGain();
-  //   track.connect(gainNode).connect(audioContext.destination);
-
-  //   const gainControl = (<HTMLInputElement>document.querySelector("#gain")!);
-
-  //   gainControl.addEventListener("input", function () {
-  //     gainNode.gain.value = Number(gainControl.value);
-  //   });
-
-  //   const volumeControl = (<HTMLInputElement>document.querySelector("#volume")!);
-
-  //   volumeControl.addEventListener("input", function () {
-  //     audioElement.volume = Number(volumeControl.value);
-  //   });
-  // }
-
-
-
-// CAN REFACTOR BASED ON HTML MEDIA ELEMENT PROPERTIES https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
-// AUDIO NODES ALLOW PROCESSING, MAY NEED THEM LATER FOR FADE OUT AND MIXING
-
-  // playPause(event: Event): void {
-  //   const audioElement = this.audioElement.nativeElement;
-  //   if (this.playing === false) {
-  //     // AN EVENT WRAPPER TO ENSURE PLAY READINESS, OTHERWISE AUDIO CAN START ONLY AFTER A NUMBER OF CLICKS
-  //     audioElement.addEventListener('canplay', () => { 
-  //       audioElement.play()
-  //       this.playing == true;
-  //     })
-  //     this.playing = true;
-  //   } else if (this.playing === true) {
-  //     audioElement.pause();
-  //     this.playing = false;
-  //   };
-  // };

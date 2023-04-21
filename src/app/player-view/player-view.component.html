@@ -1,11 +1,11 @@
 <!-- THIS IS HOW YOU LOAD LOCAL ASSETS IN ANGULAR -->
 <!-- MIGHT HAVE A CORS ISSUE WHEN LOADING FROM A SERVER -->
-<audio #audio [src]="nowPlayingUrl" preload="metadata" (timeupdate)="updateTime()"
-  (loadedmetadata)="getMetadata()"></audio>
+<!-- <audio #audio [src]="nowPlayingUrl" preload="metadata" (timeupdate)="updateTime()"
+  (loadedmetadata)="getMetadata()"> -->
+<audio #audio preload="metadata" (loadedmetadata)="getMetadata()" (timeupdate)="updateTime()" (ended)="nextTrack()">
+  <source #source />
+</audio>
 <br>
-<!-- <audio #audio src="/assets/mocks/Ne_Tvoe_Delo-Zhar-Ptitsa.m4a" preload="metadata" (timeupdate)="updateTime()"
-  (loadedmetadata)="getMetadata()"></audio>
-<br> -->
 <img #cover src="/assets/icons8-melody-64.png" alt="Album art" />
 <p>{{info.title}} - {{info.artist}}</p>
 <p>{{currentTime}} / {{duration}}</p>

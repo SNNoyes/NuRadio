@@ -12,23 +12,11 @@ export class CurrentDirComponent implements OnInit {
 
   currentDir: Track[] = [];
 
-  selectTrack(fileName: string): void {
-    // this.trackService.nowPlaying = fileName;
-    // // SET QUEUE TO MATCH THE COLLECTION, TO BE REFACTORED LATER
-    // if (this.trackService.playbackQueue.length === 0) {
-    //   // this.trackService.playbackQueue = this.collection;
-    // }
-    // this.trackService.trackAlert.emit();
-    // this.trackService.queueAlert.emit();
-  }
-
-  refreshCollection(): void {
-    // this.trackService.getCollection()
-    // .subscribe((response) => {
-    //   console.log(response);
-    //   this.collection = response;
-    // })
-  }
+  addToQueue(track: Track): void {
+    this.trackService.playbackQueue.push(track);
+    console.log(this.trackService.playbackQueue);
+    this.trackService.queueAlert.emit();
+  };
 
   // CHILDREN ARE CONTENTS OF A FOLDER IN GOOGLE DRIVE
   // BY DEFAULT THEY HAVE NO FILENAME WHICH HAS TO BE REQUESTED SEPARATELY

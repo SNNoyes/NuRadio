@@ -1,7 +1,6 @@
-<h2>My collection</h2>
+<h2>Library</h2>
 <ul>
-  <li class="track" *ngFor="let track of currentDir" (click)="selectTrack('hi')">
+  <li class="track" *ngFor="let track of currentDir" (click)="addToQueue(track)">
     <p>{{track.title}}</p>
   </li>
 </ul>
-<button type="button" (click)="refreshCollection()">Refresh</button>

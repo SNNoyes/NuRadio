@@ -15,12 +15,14 @@ export class TrackServerService {
 
   nowPlaying: string = "";
   currentDir: Track[] = [];
-  playbackQueue: string[] = [];
+  playbackQueue: Track[] = [];
   accessToken: string = "";
-  // HARDCODED MY FOLDER, TODO: ASK USER FOR IT
+  // HARDCODED MY FOLDER (Music), TODO: ASK USER FOR IT
   rootFolderId: string = "1KLwXkfJOddZP6QtDbtwTubVF_OuC0n0W";
 
-  testUrl: string = "http://localhost:3456";
+  // MVP CODE FOR CUSTOM SERVER
+  // testUrl: string = "http://localhost:3456";
+
   baseUrl: string = "https://www.googleapis.com/drive/v2/files";
 
   trackAlert = new EventEmitter();
@@ -48,7 +50,7 @@ export class TrackServerService {
       });
   };
 
-  // MVP HISTORY: FUNCTION FOR A CUSTOM SERVER
+  // MVP CODE FOR CUSTOM SERVER
   // getCollection(): Observable<string[]> {
   //   return this.http.get<string[]>(this.testUrl + "/tracks", {
   //     headers: {

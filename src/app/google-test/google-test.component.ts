@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { GoogleLoginProvider, SocialAuthService, GoogleSigninButtonDirective } from '@abacritt/angularx-social-login';
 import { SocialUser } from '@abacritt/angularx-social-login';
 import { HttpClient } from '@angular/common/http';
@@ -13,7 +13,9 @@ interface Children {
 interface Track {
   title: string;
   fileExtension: string;
+  id: string;
   webContentLink: string;
+  downloadUrl: string;
 }
 
 @Component({
@@ -24,8 +26,11 @@ interface Track {
 export class GoogleTestComponent implements OnInit {
   constructor(private authService: SocialAuthService, private http: HttpClient) { }
 
+  @ViewChild("audio") audioElement!: ElementRef;
+  @ViewChild("source") sourceElement!: ElementRef;
+
+  // THIS OBJECT CONTAINS auth_token NECESSARY TO GET ACCESS TOKEN
   user: SocialUser = new SocialUser;
-  // THIS OBJECT CONTAINS auth_token NECESSARY TO MAKE API CALLS
   loggedIn: boolean = false;
 
   private accessToken = '';
@@ -34,7 +39,7 @@ export class GoogleTestComponent implements OnInit {
 
   children: Children = {} as Children;
 
-
+  tracks: Track[] = [];
 
   renderList(): void {
     for (let child of this.children.items) {
@@ -45,9 +50,46 @@ export class GoogleTestComponent implements OnInit {
         }
       })
         .subscribe((response) => {
+          console.log(response);
           let track: Track = response as Track;
-          console.log(track.title);
+          this.tracks.push(track);
         });
+    }
+  }
+
+  // setTrack(): void {
+  //   // this.audioElement.nativeElement.src = this.baseUrl + "/" +
+  //   //   this.tracks[this.tracks.length - 1].id + "?alt=media" + "&key=" + API_KEY;
+  //   //   console.log(this.audioElement.nativeElement.src);
+  //   this.http.get(this.baseUrl + '/' + this.tracks[this.tracks.length - 1].id + "?alt=media", {
+  //     headers: {
+  //       "Authorization": "Bearer " + this.accessToken,
+  //     }})
+  //     .subscribe((response) => {
+  //       console.log(response);
+  //     })
+  // }
+
+
+  // https://security.stackexchange.com/questions/175695/how-to-pass-authorization-header-in-http-request-when-using-html5-player-audio
+  
+  async fetchTrack(): Promise<void> {
+    const audioSource = this.sourceElement.nativeElement;
+
+    const result = await fetch("https://www.googleapis.com/drive/v2/files/1TK_s6FdynzTYuoq5GMdoVRMZz_P-5Y_i?alt=media", {
+      headers: {
+        "Authorization": "Bearer " + this.accessToken,
+      }
+    });
+
+    const blob = await result.blob();
+
+    if (blob) {
+      audioSource.src = URL.createObjectURL(blob);
+      audioSource.parentElement.load();
+      console.log(audioSource.src);
+    } else {
+      console.log("Fail");
     }
   }
 
@@ -65,6 +107,7 @@ export class GoogleTestComponent implements OnInit {
 
   getFiles(): void {
     // this.http.get("https://www.googleapis.com/drive/v3/files/1RLtqlDQx-_RSZDhqzKKoJn0Df-J9KDeh", { // TO GET ONE FILE SUPPLY FILE ID
+    // this.http.get("https://www.googleapis.com/drive/v2/files/1TK_s6FdynzTYuoq5GMdoVRMZz_P-5Y_i", { // TO GET ONE FILE SUPPLY FILE ID
     // this.http.get("https://www.googleapis.com/drive/v3/files", {
     // this.http.get("https://www.googleapis.com/drive/v3/files?q=mimeType='application/vnd.google-apps.folder'", {
     // this.http.get("https://www.googleapis.com/drive/v3/files?q=name='Music'+and+mimeType='application/vnd.google-apps.folder'", {

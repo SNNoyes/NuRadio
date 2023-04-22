@@ -13,21 +13,48 @@ export class CurrentDirComponent implements OnInit {
 
   // TODO: REFACTOR AS currentDir IS ALSO ALLOWED TO DISPLAY FOLDERS 
   // SO Track TYPE IS NOT ENTIRELY CORRECT
-  currentDir: Track[] = [];
+  currentDirContents: Track[] = [];
 
   addToQueue(track: Track): void {
-    this.trackService.playbackQueue.push(track);
-    console.log(this.trackService.playbackQueue);
-    this.trackService.queueAlert.emit();
+    if (track.mimeType.slice(0, 5) === "audio") {
+      this.trackService.playbackQueue.push(track);
+      this.trackService.queueAlert.emit();
+    }
+  }
+
+  // IT IS ACTUALLY A DIRECTORY, NOT A TRACK BUT IT HAS THE id I NEED
+  goToDir(file: Track | null, direction: string): void {
+    if (file !== null && direction === "down") {
+      this.trackService.previousDirIds.push(this.trackService.dirId);
+      this.trackService.dirId = file.id;
+      this.trackService.getDirectoryContents(file.id)
+        .subscribe((response) => {
+            this.processChildren(response.items);
+        });
+    } else if (direction === "up") {
+      const prev = this.trackService.previousDirIds.pop() as string;
+      this.trackService.dirId = prev;
+      this.trackService.getDirectoryContents(prev)
+        .subscribe((response) => {
+          this.processChildren(response.items);
+        })
+    }
   }
 
   // CHILDREN ARE CONTENTS OF A FOLDER IN GOOGLE DRIVE
   // BY DEFAULT THEY HAVE NO FILENAME WHICH HAS TO BE REQUESTED SEPARATELY
   processChildren(children: []): void {
-    children.forEach((child) => {
-      this.trackService.getTrackObjects(child["id"]);
-    })
-    this.currentDir = this.trackService.currentDir;
+    if (children.length === 0) {
+      this.trackService.currentDirContents = [];
+      this.currentDirContents = this.trackService.currentDirContents;
+    }
+    const process = async (): Promise<void> => {
+      return children.forEach((child) => {
+        this.trackService.getTrackObjects(child["id"]);
+      })
+    }
+    process();
+    this.currentDirContents = this.trackService.currentDirContents;
   }
 
   handleSubmit(): void {
@@ -35,9 +62,10 @@ export class CurrentDirComponent implements OnInit {
       .subscribe((response) => {
         this.rootDirForm.nativeElement.disabled = true;
         console.log(response.files[0].id);
-        const dirId = response.files[0].id;
-        this.trackService.dirId = dirId;
-        this.trackService.getDirectory()
+        const rootDirId = response.files[0].id;
+        this.trackService.rootDirId = rootDirId;
+        this.trackService.dirId = rootDirId;
+        this.trackService.getDirectoryContents(rootDirId)
           .subscribe((response) => {
             this.processChildren(response.items);
           })

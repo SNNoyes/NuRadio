@@ -18,10 +18,13 @@ export interface Track {
 export class TrackServerService {
   constructor(private http: HttpClient) { }
 
-  currentDir: Track[] = [];
+  // IT MAY BE REASONABLE TO MAKE A STRUCTURE FOR NAVIGATION, MB LATER
+  currentDirContents: Track[] = [];
   playbackQueue: Track[] = [];
   currentTrack: Track = {} as Track;
   accessToken = "";
+  rootDirId = "";
+  previousDirIds: string[] = [];
   dirId = "";
   
   findDirectoryId(name: string): Observable<Directory | any> {
@@ -41,8 +44,8 @@ export class TrackServerService {
   queueAlert = new EventEmitter();
 
   // TODO: INTRODUCE A TYPE
-  getDirectory(): Observable<Directory | any> {
-    return this.http.get(`${this.baseUrl}/${this.dirId}/children`, {
+  getDirectoryContents(id: string): Observable<Directory | any> {
+    return this.http.get(`${this.baseUrl}/${id}/children`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
         "Content-Type": "application/json"
@@ -51,6 +54,7 @@ export class TrackServerService {
   }
 
   getTrackObjects(fileId: string): void {
+    this.currentDirContents = [];
     this.http.get(`${this.baseUrl}/${fileId}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
@@ -61,7 +65,7 @@ export class TrackServerService {
         const track = response as Track;
         // TO FILTER OUT OTHER NON-AUDIO FILES, BUT KEEP FOLDERS
         if (track.mimeType.slice(0, 5) === "audio" || track.mimeType === "application/vnd.google-apps.folder") {
-          this.currentDir.push(track as Track)
+          this.currentDirContents.push(track as Track)
         }
       });
   }

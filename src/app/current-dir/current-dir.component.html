@@ -1,11 +1,16 @@
 <h2>Library</h2>
 <label>Root music folder:
-  <input #rootDir type="text" (submit)="handleSubmit()" (keydown.enter)="handleSubmit()"/>
+  <input #rootDir type="text" (submit)="handleSubmit()" (keydown.enter)="handleSubmit()" />
 </label>
 <ul>
-  <li class="track" *ngFor="let track of currentDir" (click)="addToQueue(track)">
-    <p *ngIf="track.mimeType.slice(0, 5) === 'audio'">Audio - </p>
-    <p *ngIf="track.mimeType === 'application/vnd.google-apps.folder'">Dir - </p>
-    <p>{{track.title}}</p>
+  <li class="file" (click)="goToDir(null, 'up')" *ngIf="this.trackService.dirId !== this.trackService.rootDirId">
+    <img src="/assets/arrow.svg" alt="Go up"/>
+    Go up
+  </li>
+  <li class="file" *ngFor="let file of currentDirContents"
+    (click)="file.mimeType.slice(0, 5) === 'audio' ? addToQueue(file) : goToDir(file, 'down')">
+    <img src="/assets/cassette.svg" *ngIf="file.mimeType.slice(0, 5) === 'audio'" alt="track" />
+    <img src="/assets/folder.svg" *ngIf="file.mimeType === 'application/vnd.google-apps.folder'" alt="directory">
+    <p>{{file.title}}</p>
   </li>
 </ul>

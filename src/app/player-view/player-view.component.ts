@@ -48,6 +48,25 @@ export class PlayerViewComponent implements OnInit {
     // TO THE AUDIO SOURCE ELEMENT
     const blob = await result.blob();
     if (blob) {
+      jsmediatags.read(blob, {
+        onSuccess: (result) => {
+          console.log(result);
+          const coverArt = this.coverArt.nativeElement;
+          this.info.artist = result.tags.artist!;
+          this.info.title = result.tags.title!;
+          // APPARENTLY SOME FILES CONTAIN IMAGE DATA AS WELL
+          // PARSING BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
+          const { data, format } = result.tags.picture!;
+          let base64String = "";
+          for (let i = 0; i < data.length; i++) {
+            base64String += String.fromCharCode(data[i]);
+          }
+          coverArt.src = `data:${format};base64,${window.btoa(base64String)}`;
+        },
+        onError: (error) => {
+          console.error(error);
+        }
+      });
       audioSource.src = URL.createObjectURL(blob);
       // TODO: FIX LOAD ERROR OR HANDLE GOOGLE DRIVE THROTTLING (?)
       audioSource.parentElement.load();
@@ -83,13 +102,14 @@ export class PlayerViewComponent implements OnInit {
   getMetadata(): void {
     const audioElement = this.audioElement.nativeElement;
     const progressBar = this.progressBar.nativeElement;
-    const coverArt = this.coverArt.nativeElement;
+    // const coverArt = this.coverArt.nativeElement;
 
     const duration = audioElement.duration;
     this.duration = this.parseTime(duration) as string;
     progressBar.max = duration;
 
-    // LIBRARY STOPPED WORKING AFTER TRANSITION TO GOOGLE DRIVE
+    // LIBRARY STOPPED WORKING AFTER TRANSITION TO GOOGngLE DRIVE
+    // POSSIBLE FIX - READ FROM BLOB, CHECK OUT READ ME
     // jsmediatags.read(audioElement.source, {
     //   onSuccess: (result) => {
     //     console.log(result);

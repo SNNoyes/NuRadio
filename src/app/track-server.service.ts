@@ -21,9 +21,8 @@ export class TrackServerService {
   currentDir: Track[] = [];
   playbackQueue: Track[] = [];
   currentTrack: Track = {} as Track;
-  accessToken: string = "";
-  // HARDCODED MY FOLDER (Music), TODO: ASK USER FOR IT
-  dirId: string = "1KLwXkfJOddZP6QtDbtwTubVF_OuC0n0W";
+  accessToken = "";
+  dirId = "";
   
   findDirectoryId(name: string): Observable<Directory | any> {
     return this.http.get(`https://www.googleapis.com/drive/v3/files?q=name='${name}'+and+mimeType='application/vnd.google-apps.folder'`, {
@@ -31,12 +30,12 @@ export class TrackServerService {
         "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
         "Content-Type": "application/json"
       }})
-  };
+  }
 
   // MVP CODE FOR CUSTOM SERVER
   // testUrl: string = "http://localhost:3456";
 
-  baseUrl: string = "https://www.googleapis.com/drive/v2/files";
+  baseUrl = "https://www.googleapis.com/drive/v2/files";
 
   trackAlert = new EventEmitter();
   queueAlert = new EventEmitter();
@@ -49,7 +48,7 @@ export class TrackServerService {
         "Content-Type": "application/json"
       }
     });
-  };
+  }
 
   getTrackObjects(fileId: string): void {
     this.http.get(`${this.baseUrl}/${fileId}`, {
@@ -59,13 +58,13 @@ export class TrackServerService {
       }
     })
       .subscribe((response) => {
-        let track = response as Track;
+        const track = response as Track;
         // TO FILTER OUT OTHER NON-AUDIO FILES, BUT KEEP FOLDERS
         if (track.mimeType.slice(0, 5) === "audio" || track.mimeType === "application/vnd.google-apps.folder") {
           this.currentDir.push(track as Track)
         }
       });
-  };
+  }
 
   // MVP CODE FOR CUSTOM SERVER
   // getCollection(): Observable<string[]> {

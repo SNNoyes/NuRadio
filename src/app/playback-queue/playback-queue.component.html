@@ -1,7 +1,6 @@
 <h2>Playback queue</h2>
 <ul>
-  <li class="track" *ngFor="let track of playbackQueue">
-  <!-- <li class="track" *ngFor="let track of playbackQueue" [ngClass]="{'playing' : this.trackService.nowPlaying === track}" (click)="selectTrack(track)"> -->
+  <li class="track" *ngFor="let track of playbackQueue" [ngClass]="{'playing' : this.trackService.currentTrack.id === track.id}">
     <p>{{track.title}}</p>
   </li>
 </ul>

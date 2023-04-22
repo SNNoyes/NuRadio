@@ -2,9 +2,14 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface Directory {
+  items: [];
+}
+
 export interface Track {
   title: string;
   id: string;
+  mimeType: string;
 }
 
 @Injectable({
@@ -13,12 +18,20 @@ export interface Track {
 export class TrackServerService {
   constructor(private http: HttpClient) { }
 
-  nowPlaying: string = "";
   currentDir: Track[] = [];
   playbackQueue: Track[] = [];
+  currentTrack: Track = {} as Track;
   accessToken: string = "";
   // HARDCODED MY FOLDER (Music), TODO: ASK USER FOR IT
-  rootFolderId: string = "1KLwXkfJOddZP6QtDbtwTubVF_OuC0n0W";
+  dirId: string = "1KLwXkfJOddZP6QtDbtwTubVF_OuC0n0W";
+  
+  findDirectoryId(name: string): Observable<Directory | any> {
+    return this.http.get(`https://www.googleapis.com/drive/v3/files?q=name='${name}'+and+mimeType='application/vnd.google-apps.folder'`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+        "Content-Type": "application/json"
+      }})
+  };
 
   // MVP CODE FOR CUSTOM SERVER
   // testUrl: string = "http://localhost:3456";
@@ -29,8 +42,8 @@ export class TrackServerService {
   queueAlert = new EventEmitter();
 
   // TODO: INTRODUCE A TYPE
-  getDirectory(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${this.rootFolderId}/children`, {
+  getDirectory(): Observable<Directory | any> {
+    return this.http.get(`${this.baseUrl}/${this.dirId}/children`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
         "Content-Type": "application/json"
@@ -46,7 +59,11 @@ export class TrackServerService {
       }
     })
       .subscribe((response) => {
-        this.currentDir.push(response as Track)
+        let track = response as Track;
+        // TO FILTER OUT OTHER NON-AUDIO FILES, BUT KEEP FOLDERS
+        if (track.mimeType.slice(0, 5) === "audio" || track.mimeType === "application/vnd.google-apps.folder") {
+          this.currentDir.push(track as Track)
+        }
       });
   };
 

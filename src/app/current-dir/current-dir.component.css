@@ -1,14 +1,31 @@
+* {
+  box-sizing: border-box;
+  margin: 0px;
+}
+
 ul {
   list-style-type: none;
   padding-left: 0px;
+  overflow-y: scroll;
+  height: 450px;
 }
 
 li {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  border: solid 1px black;
+  border-radius: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 img {
   width: 30px;
-  height: 30px
+  height: 30px;
+  margin: 5px;
+}
+
+p {
+  margin: 0px;
 }

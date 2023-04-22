@@ -45,7 +45,7 @@ export class TrackServerService {
 
   // TODO: INTRODUCE A TYPE
   getDirectoryContents(id: string): Observable<Directory | any> {
-    return this.http.get(`${this.baseUrl}/${id}/children`, {
+    return this.http.get(`${this.baseUrl}/${id}/children?maxResults=1000`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
         "Content-Type": "application/json"
@@ -53,7 +53,7 @@ export class TrackServerService {
     });
   }
 
-  getTrackObjects(fileId: string): void {
+  getTrackObject(fileId: string): void {
     this.currentDirContents = [];
     this.http.get(`${this.baseUrl}/${fileId}`, {
       headers: {
@@ -64,8 +64,10 @@ export class TrackServerService {
       .subscribe((response) => {
         const track = response as Track;
         // TO FILTER OUT OTHER NON-AUDIO FILES, BUT KEEP FOLDERS
-        if (track.mimeType.slice(0, 5) === "audio" || track.mimeType === "application/vnd.google-apps.folder") {
+        if (track.mimeType.slice(0, 5) === "audio") {
           this.currentDirContents.push(track as Track)
+        } else if (track.mimeType === "application/vnd.google-apps.folder") {
+          this.currentDirContents.splice(0, 0, track as Track);
         }
       });
   }

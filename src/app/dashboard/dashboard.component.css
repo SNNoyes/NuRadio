@@ -3,10 +3,16 @@
   flex-direction: row;
 }
 
+.component {
+  padding: 5px;
+  background-color: white;
+  border-radius: 5px;
+  opacity: 80%;
+}
+
 app-current-dir {
   width: 300px;
-  border: 1px solid black;
-  padding: 5px;
+  /* border: 1px solid black; */
 }
 
 app-player-view {
@@ -14,14 +20,25 @@ app-player-view {
   flex-direction: column;
   align-items: center;
   width: 300px;
-  border: 1px solid black;
-  padding: 5px;
+  /* border: 1px solid black; */
 }
 
 app-playback-queue {
   width: 300px;
-  height: 500px;
-  border: 1px solid black;
-  padding: 5px;
+  /* border: 1px solid black; */
   overflow-y: scroll;
+}
+
+* {
+  margin: 10px;
+}
+
+video {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
+  margin: 0px;
 }

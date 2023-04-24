@@ -1,8 +1,35 @@
-img {
+#cover {
   width: 250px;
   height: 250px;
 }
 
 progress {
   width: 250px;
+}
+
+img {
+  height: 64px;
+  margin: 10px;
+}
+
+#controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.play-pause {
+  height: 64px;
+}
+
+.volume {
+  height: 32px;
+}
+
+label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }

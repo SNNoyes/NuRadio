@@ -1,19 +1,56 @@
-import { Component, OnInit, ViewChild, ElementRef, OnChanges, SimpleChanges, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterContentInit } from '@angular/core';
 import { TrackServerService } from '../track-server.service';
 import { Track } from '../track-server.service';
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+  keyframes,
+} from '@angular/animations';
 
 @Component({
   selector: 'app-current-dir',
   templateUrl: './current-dir.component.html',
-  styleUrls: ['./current-dir.component.css']
+  styleUrls: ['./current-dir.component.css'],
+  animations: [
+    trigger('waitingDone', [
+      // ATTEMPT AT ANGULAR ANIMATION
+      state('waiting', style({
+        backgroundColor: 'yellow',
+      })),
+      state('done', style({
+        // backgroundColor: 'blue'
+      })),
+      transition('waiting => done', [
+        animate('1s')
+      ]),
+      transition('* => *', [
+        animate('2s', keyframes([
+          style({ transform: 'scale(1)' }),
+          style({ transform: 'scale(1.2)' }),
+          style({ transform: 'scale(1)' })
+        ]))
+      ]),
+      transition('done => waiting', [
+        animate('1s')
+      ]),
+    ])
+  ]
 })
-export class CurrentDirComponent implements OnInit, OnChanges {
+export class CurrentDirComponent implements OnInit, AfterContentInit {
   constructor(public trackService: TrackServerService) { }
   @ViewChild("rootDir") rootDirForm!: ElementRef;
 
+  // ANIMATION STATE AND TRIGGER FOR THE INPUT ELEMENT
+  isWaiting = true;
+  toggleWaiting(): void {
+    this.isWaiting = !this.isWaiting;
+  }
+
   // TODO: REFACTOR AS currentDir IS ALSO ALLOWED TO DISPLAY FOLDERS 
   // SO Track TYPE IS NOT ENTIRELY CORRECT
-  @Input()
   currentDirContents: Track[] = [];
 
   addToQueue(track: Track): void {
@@ -61,28 +98,28 @@ export class CurrentDirComponent implements OnInit, OnChanges {
     this.trackService.findDirectoryId(this.rootDirForm.nativeElement.value)
       .subscribe((response) => {
         try {
-        this.rootDirForm.nativeElement.disabled = true;
-        console.log(response.files[0].id);
-        const rootDirId = response.files[0].id;
-        this.trackService.rootDirId = rootDirId;
-        this.trackService.dirId = rootDirId;
-        this.trackService.getDirectoryContents(rootDirId)
-          .subscribe((response) => {
-            this.processChildren(response.items)
-          })
+          this.rootDirForm.nativeElement.disabled = true;
+          console.log(response.files[0].id);
+          const rootDirId = response.files[0].id;
+          this.trackService.rootDirId = rootDirId;
+          this.trackService.dirId = rootDirId;
+          this.toggleWaiting();
+          this.trackService.getDirectoryContents(rootDirId)
+            .subscribe((response) => {
+              this.processChildren(response.items)
+            })
         } catch {
           window.alert('Directory not found on Google Drive!');
           this.rootDirForm.nativeElement.disabled = false;
+          this.toggleWaiting();
         }
       })
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['currentDirContents']) {
-      console.log('detected');
-    }
+  ngAfterContentInit(): void {
+    // window.alert("Please provide the name of your music directory on Google Drive");
   }
-
+  
   ngOnInit(): void {
     // MVP CODE FOR CUSTOM SERVER
     // this.trackService.getDirectory()

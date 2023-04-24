@@ -1,6 +1,6 @@
 <h2>Library</h2>
 <label>Root music folder:
-  <input #rootDir type="text" (submit)="handleSubmit()" (keydown.enter)="handleSubmit()" />
+  <input #rootDir type="text" (keydown.enter)="handleSubmit()" [@waitingDone]="isWaiting ? 'waiting' : 'done'"/>
 </label>
 <ul>
   <li class="file" (click)="goToDir(null, 'up')" *ngIf="this.trackService.dirId !== this.trackService.rootDirId">

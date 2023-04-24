@@ -17,20 +17,21 @@ export class LoginComponent implements OnInit {
     private trackService: TrackServerService) { }
 
   user: SocialUser = new SocialUser;
-  loggedIn: boolean = false;
+  loggedIn = false;
 
   goToDashboard(): void {
     this.router.navigateByUrl('/dashboard');
   }
 
+  // TODO: NO REFRESHING THE TOKEN FOR NOW, APP EXPIRES AT SOME POINT
   getAccessToken(): void {
     this.authService.getAccessToken(GoogleLoginProvider.PROVIDER_ID)
       .then((accessToken) => {
         localStorage.setItem("accessToken", accessToken);
       });
-  };
+  }
 
-  // LOGIN COMPONENT IS SUBSCRIBED TO THE LIBRARY LOG IN SERVICE
+  // LOGIN COMPONENT IS SUBSCRIBED TO THE LIBRARY LOGIN SERVICE
   // IF LOGGED IN, WE GO TO THE DASHBOARD
   ngOnInit(): void {
     this.authService.authState.subscribe((user) => {
@@ -39,7 +40,7 @@ export class LoginComponent implements OnInit {
       if (this.loggedIn) {
         this.goToDashboard();
         this.getAccessToken(); // TO FIX: THIS TRIGGERS A SECOND POP-UP
-      };
+      }
     });
   }
 }

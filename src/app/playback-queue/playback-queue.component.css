@@ -1,14 +1,45 @@
+h2 {
+  text-align: center;
+}
+
 ul {
   list-style-type: none;
   padding-left: 0px;
+  overflow-y: scroll;
 }
 
 li {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  /* border: solid 1px black; */
+  background-color: lightgray;
+  border-radius: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  min-height: 40px;
 }
 
 .playing {
   background-color: black;
   color: white;
+}
+
+img {
+  width: 0px;
+  height: 30px;
+  margin: 0px;
+  visibility: hidden;
+}
+
+li:hover img {
+  visibility: visible;
+  width: 30px;
+  margin: 5px;
+}
+
+p {
+  margin: 0px;
+  margin-left: 5px;
 }

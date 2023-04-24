@@ -18,7 +18,6 @@ export interface Track {
 export class TrackServerService {
   constructor(private http: HttpClient) { }
 
-  // IT MAY BE REASONABLE TO MAKE A STRUCTURE FOR NAVIGATION, MB LATER
   currentDirContents: Track[] = [];
   playbackQueue: Track[] = [];
   currentTrack: Track = {} as Track;
@@ -27,6 +26,12 @@ export class TrackServerService {
   previousDirIds: string[] = [];
   dirId = "";
   
+  // THIS TRACK SERVICE 
+  // FETCHES CONTENTS OF DIRECTORIES AND INDIVIDUAL FILE OBJECTS,
+  // KEEPS TRACK OF CURRENT DIRECTORY CONTENTS, TRAVERSED PATH THROUGH THE LIBRARY, AND
+  // PLAYBACK QUEUE,
+  // LINKS THE CURRENT DIRECTORY AND THE QUEUE COMPONENTS FOR USER TO FORM THE QUEUE
+
   findDirectoryId(name: string): Observable<Directory | any> {
     return this.http.get(`https://www.googleapis.com/drive/v3/files?q=name='${name}'+and+mimeType='application/vnd.google-apps.folder'`, {
       headers: {
@@ -43,7 +48,6 @@ export class TrackServerService {
   trackAlert = new EventEmitter();
   queueAlert = new EventEmitter();
 
-  // TODO: INTRODUCE A TYPE
   getDirectoryContents(id: string): Observable<Directory | any> {
     return this.http.get(`${this.baseUrl}/${id}/children?maxResults=1000`, {
       headers: {

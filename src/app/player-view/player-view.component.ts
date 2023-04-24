@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 // jsmediatags IS A LIBRARY THAT READS MEDIA TAGS
 import * as jsmediatags from 'jsmediatags';
 import { TrackServerService } from '../track-server.service';
@@ -10,7 +10,7 @@ import { API_KEY } from 'src/env';
   templateUrl: './player-view.component.html',
   styleUrls: ['./player-view.component.css']
 })
-export class PlayerViewComponent implements OnInit {
+export class PlayerViewComponent {
   constructor(private trackService: TrackServerService) { }
 
   // ViewChild and ElementRef ARE AN ANGULAR WAYS TO WRAP AND REFER TO DOM ELEMENTS
@@ -21,10 +21,12 @@ export class PlayerViewComponent implements OnInit {
   @ViewChild("cover") coverArt!: ElementRef;
   @ViewChild("source") sourceElement!: ElementRef;
 
-  duration: string = "0:00";
-  currentTime: string = "0:00";
+  duration = "0:00";
+  currentTime = "0:00";
   queue = this.trackService.playbackQueue;
   currentTrack: Track = {} as Track;
+  playing = false;
+  lastVolume = "";
 
   // MVP CODE FOR CUSTOM SERVER
   // testUrl: string = "http://localhost:3456";
@@ -37,15 +39,18 @@ export class PlayerViewComponent implements OnInit {
   // AUDIO ELEMENT CAN NOT FETCH TRACKS DIRECTLY BECAUSE IT DOES NOT SEND AUTH HEADERS
   async fetchTrack(fileId: string): Promise<void> {
     const audioSource = this.sourceElement.nativeElement;
-    // const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media`, {
     const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media&key=${API_KEY}`, {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
-      }
-    });
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+        }
+      });
+    if (result.status === 503) {
+      throw new Error('Failed to fetch a track');
+    }
     // START DOWNLOADING FILE TO A BLOB, CREATE A TECHNICAL URL FOR THE BLOB AND GIVE IT
     // TO THE AUDIO SOURCE ELEMENT
     const blob = await result.blob();
+    
     if (blob) {
       jsmediatags.read(blob, {
         onSuccess: (result) => {
@@ -66,6 +71,7 @@ export class PlayerViewComponent implements OnInit {
           console.error(error);
         }
       });
+
       audioSource.src = URL.createObjectURL(blob);
       // TODO: FIX LOAD ERROR OR HANDLE GOOGLE DRIVE THROTTLING (?)
       audioSource.parentElement.load();
@@ -83,15 +89,24 @@ export class PlayerViewComponent implements OnInit {
     });
     // PLAY FIRST TRACK FROM THE QUEUE IF NOTHING IS PLAYING
     if (Object.keys(this.currentTrack).length === 0) {
-      this.fetchTrack(this.queue[0].id);
       this.currentTrack = this.queue[0];
       this.trackService.currentTrack = this.currentTrack;
+      this.playing = true;
+      // TO FIX: ERRORS NEVER GET CAUGHT
+      try {
+        this.fetchTrack(this.queue[0].id);
+      } catch {
+        console.log('Failed to start playback, moving on to the next track')
+        this.nextTrack();
+      }
     } else if (audioElement.paused === true) {
       audioElement.play();
+      this.playing = true;
     } else {
       audioElement.pause();
-    };
-  };
+      this.playing = false;
+    }
+  }
 
   changeVolume(): void {
     const volumeControl = this.volumeControl.nativeElement;
@@ -119,40 +134,44 @@ export class PlayerViewComponent implements OnInit {
   seek(event: MouseEvent): void {
     const audioElement = this.audioElement.nativeElement;
     const progressBar = this.progressBar.nativeElement;
-    let newTime = event.offsetX / progressBar.offsetWidth * audioElement.duration;
+    const newTime = event.offsetX / progressBar.offsetWidth * audioElement.duration;
     progressBar.value = newTime;
     audioElement.currentTime = newTime;
   }
 
-  parseTime(totalSeconds: number): String {
+  parseTime(totalSeconds: number): string {
     totalSeconds = Math.floor(totalSeconds);
-    let minutes = Math.floor(totalSeconds / 60);
-    let seconds = totalSeconds % 60;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
     return `${minutes}:${(seconds % 60).toString().padStart(2, "0")}`;
   }
 
   nextTrack(): void {
-    let currentPos = this.trackService.playbackQueue.findIndex((element: Track) => {
+    const currentPos = this.queue.findIndex((element: Track) => {
       return element.id === this.currentTrack.id;
     });
     if (currentPos !== -1 && currentPos !== this.trackService.playbackQueue.length - 1) {
-      this.currentTrack = this.trackService.playbackQueue[currentPos + 1];
+      this.currentTrack = this.queue[currentPos + 1];
       this.trackService.currentTrack = this.currentTrack;
+      this.playing = true;
       try {
         this.fetchTrack(this.currentTrack.id);
       } catch {
+        // TO FIX: THIS CATCH BLOCK NEVER EXECUTES DESPITE FETCH ERRORS
+        console.log("Failed to fetch, moving on to the next track")
         this.nextTrack();
       }
     }
   }
 
   previousTrack(): void {
-    let currentPos = this.trackService.playbackQueue.findIndex((element: Track) => {
+    const currentPos = this.queue.findIndex((element: Track) => {
       return element.id === this.currentTrack.id;
     });
     if (currentPos !== -1 && currentPos !== 0) {
-      this.currentTrack = this.trackService.playbackQueue[currentPos - 1];
+      this.currentTrack = this.queue[currentPos - 1];
       this.trackService.currentTrack = this.currentTrack;
+      this.playing = true;
       try {
         this.fetchTrack(this.currentTrack.id);
       } catch {
@@ -161,7 +180,17 @@ export class PlayerViewComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-
+  mute(): void {
+    const audioElement = this.audioElement.nativeElement;
+    const volumeControl = this.volumeControl.nativeElement;
+    if (volumeControl.value !== "0") {
+      this.lastVolume = volumeControl.value;
+      volumeControl.value = "0";
+      audioElement.volume = 0;
+    } else {
+      audioElement.volume = Number(this.lastVolume);
+      volumeControl.value = this.lastVolume;
+    }
   }
+
 }

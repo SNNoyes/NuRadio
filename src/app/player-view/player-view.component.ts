@@ -38,8 +38,9 @@ export class PlayerViewComponent {
 
   // AUDIO ELEMENT CAN NOT FETCH TRACKS DIRECTLY BECAUSE IT DOES NOT SEND AUTH HEADERS
   async fetchTrack(fileId: string): Promise<void> {
-    try {
+    // try {
       const audioSource = this.sourceElement.nativeElement;
+      // this.audioElement.nativeElement.src = "";
       const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media&key=${API_KEY}`, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
@@ -78,14 +79,15 @@ export class PlayerViewComponent {
         // TODO: FIX LOAD ERROR OR HANDLE GOOGLE DRIVE THROTTLING (?)
         audioSource.parentElement.load();
       }
-    } catch (error) {
-      // TO FIX: THIS ERROR DOES NOT GET CAUGHT BY THE HIGHER FUNCTIONS, WILL TRY TO DO SOMETHING HERE
-      console.log(error);
-      setInterval(() => {
-        this.nextTrack();
-      }, 3000);
-      throw new Error('This error is supposed to be caught by the calling functions, but it is not');
-    }
+    // } catch (error) {
+    //   // TO FIX: THIS ERROR DOES NOT GET CAUGHT BY THE HIGHER FUNCTIONS, WILL TRY TO DO SOMETHING HERE
+    //   // BUT EVENTUALLY NEED TO HANDLE ELSEWHERE
+    //   console.log(error);
+    //   setInterval(() => {
+    //     this.nextTrack();
+    //   }, 3000);
+    //   throw new Error('This error is supposed to be caught by the calling functions, but it is not');
+    // }
   }
 
   // REFERRING TO THE ELEMENTS IN THE HANDLERS TO MAKE SURE THEY ARE INITIALIZED AND NOT NULL
@@ -100,12 +102,13 @@ export class PlayerViewComponent {
       this.currentTrack = this.queue[0];
       this.trackService.currentTrack = this.currentTrack;
       this.playing = true;
-      // TO FIX: ERRORS NEVER GET CAUGHT
       try {
-        this.fetchTrack(this.queue[0].id);
+        await this.fetchTrack(this.queue[0].id);
       } catch (error) {
-        console.log('first track', error)
-        this.nextTrack();
+        console.log(error);
+        setTimeout(() => {
+          this.nextTrack();
+        }, 1000);
       }
     } else if (audioElement.paused === true) {
       audioElement.play();
@@ -155,7 +158,7 @@ export class PlayerViewComponent {
   }
 
   async nextTrack(): Promise<void> {
-    // try {
+    try {
       const currentPos = this.queue.findIndex((element: Track) => {
         return element.id === this.currentTrack.id;
       });
@@ -163,14 +166,14 @@ export class PlayerViewComponent {
         this.currentTrack = this.queue[currentPos + 1];
         this.trackService.currentTrack = this.currentTrack;
         this.playing = true;
-
-        this.fetchTrack(this.currentTrack.id);
+        await this.fetchTrack(this.currentTrack.id);
       }
-    // } catch (error) {
-    //   // TO FIX: THIS CATCH BLOCK NEVER EXECUTES DESPITE FETCH ERRORS
-    //   console.log("Here", error);
-    //   this.nextTrack();
-    // }
+    } catch (error) {
+      console.log(error);
+      setTimeout(() => {
+        this.nextTrack();
+      }, 1000);
+    }
   }
 
 
@@ -179,15 +182,18 @@ export class PlayerViewComponent {
       return element.id === this.currentTrack.id;
     });
     if (currentPos !== -1 && currentPos !== 0) {
+      // this.audioElement.nativeElement.src = "";
       this.currentTrack = this.queue[currentPos - 1];
       this.trackService.currentTrack = this.currentTrack;
       this.playing = true;
-      // try {
-        this.fetchTrack(this.currentTrack.id);
-      // } catch (error) {
-      //   console.log("here 454564564564", error);
-      //   this.previousTrack();
-      // }
+      try {
+        await this.fetchTrack(this.currentTrack.id);
+      } catch (error) {
+        console.log(error);
+        setTimeout(() => {
+          this.previousTrack();
+        }, 1000);
+      }
     }
   }
 

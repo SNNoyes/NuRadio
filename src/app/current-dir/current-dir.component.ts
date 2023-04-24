@@ -92,6 +92,7 @@ export class CurrentDirComponent implements OnInit, AfterContentInit {
     })
     // TODO: FIGURE OUT HOW TO SORT FILES BY NAME - HELP REQUEST?
     this.currentDirContents = this.trackService.currentDirContents;
+    console.log(this.currentDirContents);
   }
 
   handleSubmit(): void {

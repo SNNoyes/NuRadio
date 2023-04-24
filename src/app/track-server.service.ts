@@ -1,6 +1,8 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { SocialAuthService } from "@abacritt/angularx-social-login";
+import { GoogleLoginProvider } from "@abacritt/angularx-social-login";
 
 export interface Directory {
   items: [];
@@ -16,7 +18,7 @@ export interface Track {
   providedIn: 'root'
 })
 export class TrackServerService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: SocialAuthService) { }
 
   currentDirContents: Track[] = [];
   playbackQueue: Track[] = [];
@@ -58,7 +60,6 @@ export class TrackServerService {
   }
 
   getTrackObject(fileId: string): void {
-    this.currentDirContents = [];
     this.http.get(`${this.baseUrl}/${fileId}`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
@@ -74,6 +75,15 @@ export class TrackServerService {
           this.currentDirContents.splice(0, 0, track as Track);
         }
       });
+  }
+
+  refreshToken1(): void {
+    this.authService.refreshAuthToken(GoogleLoginProvider.PROVIDER_ID);
+  }
+
+  refreshToken2(): void {
+    this.authService.refreshAccessToken(GoogleLoginProvider.PROVIDER_ID);
+    // localStorage.setItem()
   }
 
   // MVP CODE FOR CUSTOM SERVER

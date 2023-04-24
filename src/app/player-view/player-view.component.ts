@@ -40,10 +40,12 @@ export class PlayerViewComponent implements AfterViewInit {
   async fetchTrack(fileId: string): Promise<void> {
     // try {
       const audioSource = this.sourceElement.nativeElement;
-      // this.audioElement.nativeElement.src = "";
+      this.audioElement.nativeElement.pause();
+      // audioSource.src = "";
       const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media&key=${API_KEY}`, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "audio/*"
         }
       });
       console.log(result);

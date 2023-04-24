@@ -16,7 +16,7 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop'
   templateUrl: './current-dir.component.html',
   styleUrls: ['./current-dir.component.css'],
   animations: [
-    
+
   ]
 })
 export class CurrentDirComponent implements OnInit, AfterContentInit {
@@ -62,7 +62,8 @@ export class CurrentDirComponent implements OnInit, AfterContentInit {
 
   // CHILDREN ARE CONTENTS OF A FOLDER IN GOOGLE DRIVE
   // BY DEFAULT THEY HAVE NO FILENAME WHICH HAS TO BE REQUESTED SEPARATELY
-  processChildren(children: []): void {
+  async processChildren(children: []): Promise<void> {
+    this.trackService.currentDirContents = [];
     if (children.length === 0) {
       this.trackService.currentDirContents = [];
       this.currentDirContents = this.trackService.currentDirContents;
@@ -70,10 +71,9 @@ export class CurrentDirComponent implements OnInit, AfterContentInit {
     children.forEach((child) => {
       this.trackService.getTrackObject(child["id"]);
     })
-    // TODO: FIGURE OUT HOW TO SORT FILES BY NAME - HELP REQUEST?
     this.currentDirContents = this.trackService.currentDirContents;
     console.log(this.currentDirContents);
-
+    // TODO: FIGURE OUT HOW TO SORT FILES BY NAME - HELP REQUEST?
     // GRAPHQL, API SERVICE, LIST OF POKEMON IDS CODE, REQUEST FOR EACH ID, REST FOLDER
   }
 
@@ -99,11 +99,15 @@ export class CurrentDirComponent implements OnInit, AfterContentInit {
       })
   }
 
+  
+
   ngAfterContentInit(): void {
     // window.alert("Please provide the name of your music directory on Google Drive");
   }
-  
+
   ngOnInit(): void {
+
+
     // MVP CODE FOR CUSTOM SERVER
     // this.trackService.getDirectory()
     //   .subscribe((response) => {

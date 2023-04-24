@@ -28,9 +28,12 @@ export class PlaybackQueueComponent implements OnInit {
 
   dropPQ(event: any) {
     if (event.previousContainer !== event.container) {
-      this.trackService.playbackQueue.splice(event.currentIndex,
-        0, this.trackService.currentDirContents[event.previousIndex]);
-      this.trackService.queueAlert.emit();
+      if (this.trackService.currentDirContents[event.previousIndex]
+        .mimeType.slice(0, 5) === 'audio') {
+        this.trackService.playbackQueue.splice(event.currentIndex,
+          0, this.trackService.currentDirContents[event.previousIndex]);
+        this.trackService.queueAlert.emit();
+      }
     } else {
       const a = event.previousIndex;
       const b = event.currentIndex;

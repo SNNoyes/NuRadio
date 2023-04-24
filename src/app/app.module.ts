@@ -49,7 +49,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(
               CLIENT_ID, 
-              { oneTapEnabled: true,
+              { oneTapEnabled: false,
                 scopes: ["https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/drive.metadata"]}
             )
           }

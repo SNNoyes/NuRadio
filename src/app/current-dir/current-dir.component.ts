@@ -9,6 +9,7 @@ import {
   transition,
   keyframes,
 } from '@angular/animations';
+import { CdkDragDrop } from '@angular/cdk/drag-drop'
 
 @Component({
   selector: 'app-current-dir',

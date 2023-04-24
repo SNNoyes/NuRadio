@@ -2,13 +2,15 @@
 <label>
   <input #rootDir type="text" (keydown.enter)="handleSubmit()" placeholder="Your Google Drive music folder name" />
 </label>
-<ul>
+<ul id="dir-list" cdkDropList 
+  cdkDropListConnectedTo="queue-list"
+  cdkDropListData="this.trackService.playbackQueue">
   <li class="file" (click)="goToDir(null, 'up')" *ngIf="this.trackService.dirId !== this.trackService.rootDirId">
-    <img src="/assets/arrow.svg" alt="Go up"/>
+    <img src="/assets/arrow.svg" alt="Go up" />
     Go up
   </li>
   <li class="file" *ngFor="let file of currentDirContents"
-    (click)="file.mimeType.slice(0, 5) === 'audio' ? addToQueue(file) : goToDir(file, 'down')">
+    (click)="file.mimeType.slice(0, 5) === 'audio' ? addToQueue(file) : goToDir(file, 'down')" cdkDrag>
     <img src="/assets/cassette.svg" *ngIf="file.mimeType.slice(0, 5) === 'audio'" alt="track" />
     <img src="/assets/folder.svg" *ngIf="file.mimeType === 'application/vnd.google-apps.folder'" alt="directory">
     <p>{{file.title}}</p>

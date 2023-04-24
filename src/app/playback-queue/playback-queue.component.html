@@ -1,7 +1,9 @@
 <h2>Playback queue</h2>
-<!-- <ul cdkDropList (cdkDropListDropped)="drop($event)"> -->
-<ul cdkDropList (cdkDropListDropped)="drop($event)">
-  <li class="track" *ngFor="let track of playbackQueue" [ngClass]="{'playing' : this.trackService.currentTrack.id === track.id}" cdkDrag>
+<ul id="queue-list" cdkDropList (cdkDropListDropped)="dropPQ($event)" 
+  cdkDropListConnectedTo="dir-list"
+  cdkDropListData="this.trackService.currentDirContents">
+  <li class="track" *ngFor="let track of playbackQueue"
+    [ngClass]="{'playing' : this.trackService.currentTrack.id === track.id}" cdkDrag>
     <p>{{track.title}}</p>
     <img src="/assets/trash.svg" alt="trashcan" (click)="removeTrack(track.id)" />
   </li>

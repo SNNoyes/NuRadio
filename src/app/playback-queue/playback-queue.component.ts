@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TrackServerService } from '../track-server.service';
 import { Track } from '../track-server.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop'
 
 @Component({
   selector: 'app-playback-queue',
@@ -25,11 +26,18 @@ export class PlaybackQueueComponent implements OnInit {
     this.trackService.queueAlert.emit();
   }
 
-  drop(event: any) {
-    let a = event.previousIndex;
-    let b = event.currentIndex;
-    const queue = this.trackService.playbackQueue;
-    [queue[a], queue[b]] = [queue[b], queue[a]];
+  dropPQ(event: any) {
+    if (event.previousContainer !== event.container) {
+      this.trackService.playbackQueue.splice(event.currentIndex,
+        0, this.trackService.currentDirContents[event.previousIndex]);
+      this.trackService.queueAlert.emit();
+    } else {
+      const a = event.previousIndex;
+      const b = event.currentIndex;
+      const queue = this.trackService.playbackQueue;
+      [queue[a], queue[b]] = [queue[b], queue[a]];
+      this.trackService.queueAlert.emit();
+    }
   }
 
   ngOnInit(): void {

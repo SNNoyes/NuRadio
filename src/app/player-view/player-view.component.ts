@@ -146,6 +146,8 @@ export class PlayerViewComponent implements AfterViewInit {
     return `${minutes}:${(seconds % 60).toString().padStart(2, "0")}`;
   }
 
+  // TODO: CHECK NAVIGATION, BE SURE TO WAIT UNTIL THE TRACK LOADS
+  // BEFORE MOVING THE POINTER (VARIABLE POINTER + CLASS STYLE)
   async nextTrack(): Promise<void> {
     try {
       const currentPos = this.queue.findIndex((element: Track) => {

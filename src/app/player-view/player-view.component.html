@@ -5,7 +5,6 @@
 <audio #audio preload="metadata" (loadedmetadata)="getMetadata()" (timeupdate)="updateTime()" (ended)="nextTrack()">
   <source #source />
 </audio>
-<br>
 <img #cover id="cover" src="/assets/cassette.svg" alt="Album art" />
 <p>{{info.title}} - {{info.artist}}</p>
 <p>{{currentTime}} / {{duration}}</p>

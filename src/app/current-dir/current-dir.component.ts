@@ -15,28 +15,7 @@ import {
   templateUrl: './current-dir.component.html',
   styleUrls: ['./current-dir.component.css'],
   animations: [
-    trigger('waitingDone', [
-      // ATTEMPT AT ANGULAR ANIMATION
-      state('waiting', style({
-        backgroundColor: 'yellow',
-      })),
-      state('done', style({
-        // backgroundColor: 'blue'
-      })),
-      transition('waiting => done', [
-        animate('1s')
-      ]),
-      transition('* => *', [
-        animate('2s', keyframes([
-          style({ transform: 'scale(1)' }),
-          style({ transform: 'scale(1.2)' }),
-          style({ transform: 'scale(1)' })
-        ]))
-      ]),
-      transition('done => waiting', [
-        animate('1s')
-      ]),
-    ])
+    
   ]
 })
 export class CurrentDirComponent implements OnInit, AfterContentInit {
@@ -93,6 +72,8 @@ export class CurrentDirComponent implements OnInit, AfterContentInit {
     // TODO: FIGURE OUT HOW TO SORT FILES BY NAME - HELP REQUEST?
     this.currentDirContents = this.trackService.currentDirContents;
     console.log(this.currentDirContents);
+
+    // GRAPHQL, API SERVICE, LIST OF POKEMON IDS CODE, REQUEST FOR EACH ID, REST FOLDER
   }
 
   handleSubmit(): void {

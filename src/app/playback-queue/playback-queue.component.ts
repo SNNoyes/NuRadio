@@ -25,6 +25,13 @@ export class PlaybackQueueComponent implements OnInit {
     this.trackService.queueAlert.emit();
   }
 
+  drop(event: any) {
+    let a = event.previousIndex;
+    let b = event.currentIndex;
+    const queue = this.trackService.playbackQueue;
+    [queue[a], queue[b]] = [queue[b], queue[a]];
+  }
+
   ngOnInit(): void {
     this.trackService.queueAlert.subscribe((event) => {
       this.playbackQueue = this.trackService.playbackQueue;

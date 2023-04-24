@@ -1,6 +1,6 @@
 <h2>Library</h2>
-<label>Root music folder:
-  <input #rootDir type="text" (keydown.enter)="handleSubmit()" [@waitingDone]="isWaiting ? 'waiting' : 'done'"/>
+<label>
+  <input #rootDir type="text" (keydown.enter)="handleSubmit()" placeholder="Your Google Drive music folder name" />
 </label>
 <ul>
   <li class="file" (click)="goToDir(null, 'up')" *ngIf="this.trackService.dirId !== this.trackService.rootDirId">

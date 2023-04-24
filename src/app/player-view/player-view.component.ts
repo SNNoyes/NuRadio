@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 // jsmediatags IS A LIBRARY THAT READS MEDIA TAGS
 import * as jsmediatags from 'jsmediatags';
 import { TrackServerService } from '../track-server.service';
@@ -10,7 +10,7 @@ import { API_KEY } from 'src/env';
   templateUrl: './player-view.component.html',
   styleUrls: ['./player-view.component.css']
 })
-export class PlayerViewComponent {
+export class PlayerViewComponent implements AfterViewInit {
   constructor(private trackService: TrackServerService) { }
 
   // ViewChild and ElementRef ARE AN ANGULAR WAYS TO WRAP AND REFER TO DOM ELEMENTS
@@ -78,30 +78,21 @@ export class PlayerViewComponent {
         audioSource.src = URL.createObjectURL(blob);
         // TODO: FIX LOAD ERROR OR HANDLE GOOGLE DRIVE THROTTLING (?)
         audioSource.parentElement.load();
+        const audioElement = this.audioElement.nativeElement;
+        audioElement.addEventListener('canplay', (event: Event) => {
+          this.audioElement.nativeElement.play()
+        });
       }
-    // } catch (error) {
-    //   // TO FIX: THIS ERROR DOES NOT GET CAUGHT BY THE HIGHER FUNCTIONS, WILL TRY TO DO SOMETHING HERE
-    //   // BUT EVENTUALLY NEED TO HANDLE ELSEWHERE
-    //   console.log(error);
-    //   setInterval(() => {
-    //     this.nextTrack();
-    //   }, 3000);
-    //   throw new Error('This error is supposed to be caught by the calling functions, but it is not');
-    // }
   }
 
   // REFERRING TO THE ELEMENTS IN THE HANDLERS TO MAKE SURE THEY ARE INITIALIZED AND NOT NULL
   async playPause(event: Event): Promise<void | null> {
     if (this.queue.length === 0) return null;
     const audioElement = this.audioElement.nativeElement;
-    audioElement.addEventListener('canplay', (event: Event) => {
-      this.audioElement.nativeElement.play()
-    });
     // PLAY FIRST TRACK FROM THE QUEUE IF NOTHING IS PLAYING
     if (Object.keys(this.currentTrack).length === 0) {
       this.currentTrack = this.queue[0];
       this.trackService.currentTrack = this.currentTrack;
-      this.playing = true;
       try {
         await this.fetchTrack(this.queue[0].id);
       } catch (error) {
@@ -112,10 +103,8 @@ export class PlayerViewComponent {
       }
     } else if (audioElement.paused === true) {
       audioElement.play();
-      this.playing = true;
     } else {
       audioElement.pause();
-      this.playing = false;
     }
   }
 
@@ -165,7 +154,6 @@ export class PlayerViewComponent {
       if (currentPos !== -1 && currentPos !== this.trackService.playbackQueue.length - 1) {
         this.currentTrack = this.queue[currentPos + 1];
         this.trackService.currentTrack = this.currentTrack;
-        this.playing = true;
         await this.fetchTrack(this.currentTrack.id);
       }
     } catch (error) {
@@ -176,16 +164,13 @@ export class PlayerViewComponent {
     }
   }
 
-
   async previousTrack(): Promise<void> {
     const currentPos = this.queue.findIndex((element: Track) => {
       return element.id === this.currentTrack.id;
     });
     if (currentPos !== -1 && currentPos !== 0) {
-      // this.audioElement.nativeElement.src = "";
       this.currentTrack = this.queue[currentPos - 1];
       this.trackService.currentTrack = this.currentTrack;
-      this.playing = true;
       try {
         await this.fetchTrack(this.currentTrack.id);
       } catch (error) {
@@ -208,6 +193,16 @@ export class PlayerViewComponent {
       audioElement.volume = Number(this.lastVolume);
       volumeControl.value = this.lastVolume;
     }
+  }
+
+  ngAfterViewInit(): void {
+    const audioElement = this.audioElement.nativeElement;
+    audioElement.addEventListener('playing', () => {
+      this.playing = true;
+    });
+    audioElement.addEventListener('pause', () => {
+      this.playing = false;
+    })
   }
 
 }

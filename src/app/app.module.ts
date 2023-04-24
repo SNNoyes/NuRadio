@@ -17,6 +17,7 @@ import { CLIENT_ID, API_KEY } from 'src/env';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginComponent } from './login/login.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { NotFoundComponent } from './not-found/not-found.component';
     BrowserAnimationsModule,
     HttpClientModule,
     SocialLoginModule,
-    FormsModule
+    FormsModule,
+    DragDropModule
   ],
   providers: [
     {

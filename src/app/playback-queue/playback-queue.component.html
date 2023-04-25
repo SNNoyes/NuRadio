@@ -1,5 +1,5 @@
 <h2>Playback queue</h2>
-<ul id="queue-list" cdkDropList (cdkDropListDropped)="dropPQ($event)" 
+<ul id="queue-list" cdkDropList (cdkDropListDropped)="dropIntoPlaybackQueue($event)" 
   cdkDropListConnectedTo="dir-list"
   cdkDropListData="this.trackService.currentDirContents">
   <li class="track" *ngFor="let track of playbackQueue"

@@ -4,6 +4,7 @@ import * as jsmediatags from 'jsmediatags';
 import { TrackServerService } from '../track-server.service';
 import { Track } from '../track-server.service';
 import { GauthService } from '../gauth.service';
+import { parseTime } from '../utils/utils';
 
 @Component({
   selector: 'app-player-view',
@@ -14,7 +15,7 @@ export class PlayerViewComponent implements AfterViewInit {
   constructor(private trackService: TrackServerService,
     private gauth: GauthService) { }
 
-  // ViewChild and ElementRef ARE AN ANGULAR WAYS TO WRAP AND REFER TO DOM ELEMENTS
+  // ViewChild and ElementRef ARE ANGULAR WAYS TO WRAP AND REFER TO DOM ELEMENTS
   // USING DOM SELECTORS DIRECTLY IS NOT FOR ANGULAR
   @ViewChild("audio") audioElement!: ElementRef;
   @ViewChild("volume") volumeControl!: ElementRef;
@@ -29,20 +30,10 @@ export class PlayerViewComponent implements AfterViewInit {
   playing = false;
   lastVolume = "";
 
-  // MVP CODE FOR CUSTOM SERVER
-  // testUrl: string = "http://localhost:3456";
-
   info = {
     artist: "Artist" as string,
     title: "Title" as string
   };
-
-  // AUDIO ELEMENT CAN NOT FETCH TRACKS DIRECTLY BECAUSE IT DOES NOT SEND AUTH HEADERS
-
-  // const file = await service.files.get({
-  //   fileId: fileId,
-  //   alt: 'media',
-  // });
 
   async fetchTrack(fileId: string): Promise<void> {
     const audioSource = this.sourceElement.nativeElement;
@@ -50,7 +41,7 @@ export class PlayerViewComponent implements AfterViewInit {
 
     // START DOWNLOADING FILE TO A BLOB, CREATE A TECHNICAL URL FOR THE BLOB AND GIVE IT
     // TO THE AUDIO SOURCE ELEMENT
-    const response = await this.gauth.fetchTrack(fileId);
+    const response = await this.gauth.getFileFetchAPI(fileId);
     const blob = await response?.blob();
 
     if (blob) {
@@ -82,56 +73,6 @@ export class PlayerViewComponent implements AfterViewInit {
       });
     }
   }
-
-  // async fetchTrack(fileId: string): Promise<void> {
-  //   // try {
-  //     const audioSource = this.sourceElement.nativeElement;
-  //     this.audioElement.nativeElement.pause();
-  //     // audioSource.src = "";
-  //     const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media&key=${API_KEY}`, {
-  //       headers: {
-  //         "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
-  //         "Content-Type": "audio/*"
-  //       }
-  //     });
-  //     console.log(result);
-  //     if (result.status === 503) {
-  //       throw new Error('Failed to fetch a track');
-  //     }
-  //     // START DOWNLOADING FILE TO A BLOB, CREATE A TECHNICAL URL FOR THE BLOB AND GIVE IT
-  //     // TO THE AUDIO SOURCE ELEMENT
-  //     const blob = await result.blob();
-
-  //     if (blob) {
-  //       jsmediatags.read(blob, {
-  //         onSuccess: (result) => {
-  //           console.log(result);
-  //           const coverArt = this.coverArt.nativeElement;
-  //           this.info.artist = result.tags.artist!;
-  //           this.info.title = result.tags.title!;
-  //           // APPARENTLY SOME FILES CONTAIN IMAGE DATA AS WELL
-  //           // PARSING BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
-  //           const { data, format } = result.tags.picture!;
-  //           let base64String = "";
-  //           for (let i = 0; i < data.length; i++) {
-  //             base64String += String.fromCharCode(data[i]);
-  //           }
-  //           coverArt.src = `data:${format};base64,${window.btoa(base64String)}`;
-  //         },
-  //         onError: (error) => {
-  //           console.error(error);
-  //         }
-  //       });
-
-  //       audioSource.src = URL.createObjectURL(blob);
-  //       // TODO: FIX LOAD ERROR OR HANDLE GOOGLE DRIVE THROTTLING (?)
-  //       audioSource.parentElement.load();
-  //       const audioElement = this.audioElement.nativeElement;
-  //       audioElement.addEventListener('canplay', (event: Event) => {
-  //         this.audioElement.nativeElement.play()
-  //       });
-  //     }
-  // }
 
   // REFERRING TO THE ELEMENTS IN THE HANDLERS TO MAKE SURE THEY ARE INITIALIZED AND NOT NULL
   async playPause(event: Event): Promise<void | null> {
@@ -165,9 +106,8 @@ export class PlayerViewComponent implements AfterViewInit {
   getMetadata(): void {
     const audioElement = this.audioElement.nativeElement;
     const progressBar = this.progressBar.nativeElement;
-
     const duration = audioElement.duration;
-    this.duration = this.parseTime(duration) as string;
+    this.duration = parseTime(duration) as string;
     progressBar.max = duration;
   }
 
@@ -175,7 +115,7 @@ export class PlayerViewComponent implements AfterViewInit {
     const audioElement = this.audioElement.nativeElement;
     const progressBar = this.progressBar.nativeElement;
     const currentTime = audioElement.currentTime;
-    this.currentTime = this.parseTime(currentTime) as string;
+    this.currentTime = parseTime(currentTime) as string;
     progressBar.value = currentTime;
   }
 
@@ -185,13 +125,6 @@ export class PlayerViewComponent implements AfterViewInit {
     const newTime = event.offsetX / progressBar.offsetWidth * audioElement.duration;
     progressBar.value = newTime;
     audioElement.currentTime = newTime;
-  }
-
-  parseTime(totalSeconds: number): string {
-    totalSeconds = Math.floor(totalSeconds);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${(seconds % 60).toString().padStart(2, "0")}`;
   }
 
   // TODO: CHECK NAVIGATION, BE SURE TO WAIT UNTIL THE TRACK LOADS
@@ -254,5 +187,4 @@ export class PlayerViewComponent implements AfterViewInit {
       this.playing = false;
     })
   }
-
 }

@@ -165,7 +165,7 @@ export class GauthService {
   }
 
   // TO KEEP BLOB LOGIC ON THE PLAYER USED FETCH INSTEAD OF API LIBRARY REQUEST
-  async fetchTrack(id: string) {
+  async getFileFetchAPI(id: string) {
     try {
       const token = this.getToken();
       return fetch(

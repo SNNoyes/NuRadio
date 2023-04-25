@@ -1,7 +1,3 @@
-<!-- THIS IS HOW YOU LOAD LOCAL ASSETS IN ANGULAR -->
-<!-- MIGHT HAVE A CORS ISSUE WHEN LOADING FROM A SERVER -->
-<!-- <audio #audio [src]="nowPlayingUrl" preload="metadata" (timeupdate)="updateTime()"
-  (loadedmetadata)="getMetadata()"> -->
 <audio #audio preload="metadata" (loadedmetadata)="getMetadata()" (timeupdate)="updateTime()" (ended)="nextTrack()">
   <source #source />
 </audio>

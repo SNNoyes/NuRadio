@@ -27,7 +27,7 @@ export class PlaybackQueueComponent implements OnInit {
     this.trackService.queueAlert.emit();
   }
 
-  dropPQ(event: any) {
+  dropIntoPlaybackQueue(event: any) {
     if (event.previousContainer !== event.container) {
       if (this.trackService.currentDirContents[event.previousIndex]
         .mimeType.slice(0, 5) === 'audio') {

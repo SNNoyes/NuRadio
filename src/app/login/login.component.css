@@ -26,3 +26,7 @@ asl-google-signin-button {
   flex-direction: row;
   justify-content: center;
 }
+
+#gauth {
+  position: relative;
+}

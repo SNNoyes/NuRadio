@@ -1,4 +1,3 @@
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <video autoplay="true" muted loop>
   <source src="/assets/clouds.mp4" type="video/mp4"/>
 </video>
@@ -7,3 +6,12 @@
   <asl-google-signin-button type="standard" size="large" logo_alignment="center">
   </asl-google-signin-button>
 </div>
+
+<!-- GOOGLE-BASED CODE -->
+<div id="gauth">
+  <h1>Testing Google Auth</h1>
+  <button id="authorize_button" (click)="handleAuthClick()">Authorize</button>
+  <button id="signout_button" (click)="handleSignoutClick()">Sign Out</button>
+  <button (click)="listFiles()">Get files</button>
+</div>
+<!-- GOOGLE-BASED CODE -->

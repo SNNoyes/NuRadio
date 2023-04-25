@@ -62,17 +62,18 @@ export class CurrentDirComponent implements OnInit, AfterContentInit {
 
   // CHILDREN ARE CONTENTS OF A FOLDER IN GOOGLE DRIVE
   // BY DEFAULT THEY HAVE NO FILENAME WHICH HAS TO BE REQUESTED SEPARATELY
-  async processChildren(children: []): Promise<void> {
+  async processChildren(children: Track[]): Promise<void> {
     this.trackService.currentDirContents = [];
     if (children.length === 0) {
       this.trackService.currentDirContents = [];
-      this.currentDirContents = this.trackService.currentDirContents;
+      this.trackService.dirAlert.emit();
+      // this.currentDirContents = this.trackService.currentDirContents;
+    } else {
+      children.forEach((child) => {
+        this.trackService.getTrackObject(child["id"], children.length);
+      })
+      // this.currentDirContents = this.trackService.currentDirContents;
     }
-    children.forEach((child) => {
-      this.trackService.getTrackObject(child["id"]);
-    })
-    this.currentDirContents = this.trackService.currentDirContents;
-    console.log(this.currentDirContents);
     // TODO: FIGURE OUT HOW TO SORT FILES BY NAME - HELP REQUEST?
     // GRAPHQL, API SERVICE, LIST OF POKEMON IDS CODE, REQUEST FOR EACH ID, REST FOLDER
   }
@@ -106,7 +107,10 @@ export class CurrentDirComponent implements OnInit, AfterContentInit {
   }
 
   ngOnInit(): void {
-
+    this.trackService.dirAlert.subscribe((event) => {
+      this.currentDirContents = this.trackService.currentDirContents;
+      // this.playbackQueue = this.trackService.playbackQueue;
+    })
 
     // MVP CODE FOR CUSTOM SERVER
     // this.trackService.getDirectory()

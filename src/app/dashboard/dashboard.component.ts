@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { GauthService } from '../gauth.service';
 
 @Component({
@@ -6,7 +6,12 @@ import { GauthService } from '../gauth.service';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements AfterViewInit {
   constructor(public gauth: GauthService) { }
 
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.gauth.handleAuthClick();
+    }, 1000);
+  }
 }

@@ -16,9 +16,7 @@ export class LoginComponent {
   }
 
   async signIn() {
-    await this.gauth.handleAuthClick()
-      .then(() => {
-        this.goToDashboard();
-      })
+    this.gauth.handleAuthClick()
+    this.goToDashboard();
   }
 }

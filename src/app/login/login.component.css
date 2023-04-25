@@ -30,3 +30,28 @@ video {
   z-index: 6;
   padding: 10px;
 }
+
+.gradient-background {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
+  margin: 0px;
+  background: linear-gradient(45deg,#006ba6,#0496ff,#ffbc42,#d81159,#8f2d56);
+  background-size: 500% 500%;
+  animation: gradient-animation 60s ease infinite;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

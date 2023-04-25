@@ -48,6 +48,7 @@ export class CurrentDirComponent implements OnInit {
     const input = this.rootDirForm.nativeElement;
       try {
         const root = await this.gauth.searchFile(input.value)
+        input.value = ` /${input.value}`;
         input.disabled = true;
         console.log(root);
         this.trackService.rootDirId = root.id;
@@ -58,7 +59,7 @@ export class CurrentDirComponent implements OnInit {
         this.trackService.dirAlert.emit();
       } catch (error) {
         console.log(error);
-        window.alert('Directory not found on Google Drive!');
+        window.alert('Directory not found on Google Drive or you need to re-login');
         input.value = "";
         input.disabled = false;
       }

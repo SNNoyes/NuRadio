@@ -13,6 +13,7 @@ export interface Track {
   title: string;
   id: string;
   mimeType: string;
+  name: string;
 }
 
 @Injectable({

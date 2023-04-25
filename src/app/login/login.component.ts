@@ -40,6 +40,13 @@ export class LoginComponent implements OnInit {
       });
   }
 
+  async signIn() {
+    await this.gauth.handleAuthClick()
+      .then(() => {
+        this.goToDashboard();
+      })
+  }
+
   // // GOOGLE-BASED CODE
   // tokenClient: any;
   // gapiInited = false;

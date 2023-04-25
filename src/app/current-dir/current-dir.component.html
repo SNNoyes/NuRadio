@@ -13,6 +13,6 @@
     (click)="file.mimeType.slice(0, 5) === 'audio' ? addToQueue(file) : goToDir(file, 'down')" cdkDrag>
     <img src="/assets/cassette.svg" *ngIf="file.mimeType.slice(0, 5) === 'audio'" alt="track" />
     <img src="/assets/folder.svg" *ngIf="file.mimeType === 'application/vnd.google-apps.folder'" alt="directory">
-    <p>{{file.title}}</p>
+    <p>{{file.name}}</p>
   </li>
 </ul>

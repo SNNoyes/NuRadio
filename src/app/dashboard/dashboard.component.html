@@ -3,6 +3,8 @@
   <app-player-view class="component"></app-player-view>
   <app-playback-queue class="component"></app-playback-queue>
 </div>
+<button type="button" (click)="this.gauth.searchFile('test')">Test</button>
+<button id="authorize_button" (click)="this.gauth.handleAuthClick()">Sign in with Google</button>
 <video autoplay="true" muted loop>
   <source src="/assets/clouds.mp4" type="video/mp4"/>
 </video>

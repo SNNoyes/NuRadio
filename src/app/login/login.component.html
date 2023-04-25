@@ -3,15 +3,17 @@
 </video>
 <div id="flex-container">
   <h1>DriveTracks</h1>
-  <asl-google-signin-button type="standard" size="large" logo_alignment="center">
-  </asl-google-signin-button>
+  <!-- <asl-google-signin-button type="standard" size="large" logo_alignment="center">
+  </asl-google-signin-button> -->
+  <!-- <button id="authorize_button" (click)="this.gauth.handleAuthClick()">Sign in with Google</button> -->
+  <button id="authorize_button" (click)="signIn()">Sign in with Google</button>
 </div>
 
 <!-- GOOGLE-BASED CODE -->
 <div id="gauth">
-  <h1>Testing Google Auth</h1>
+  <!-- <h1>Testing Google Auth</h1>
   <button id="authorize_button" (click)="this.gauth.handleAuthClick()">Authorize</button>
-  <button id="signout_button" (click)="this.gauth.handleSignoutClick()">Sign Out</button>
+  <button id="signout_button" (click)="this.gauth.handleSignoutClick()">Sign Out</button> -->
   <button (click)="this.gauth.listFiles()">Get files</button>
 </div>
 <!-- GOOGLE-BASED CODE -->

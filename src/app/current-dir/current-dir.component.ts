@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterContentInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { TrackServerService } from '../track-server.service';
 import { Track } from '../track-server.service';
 import {
@@ -10,6 +10,7 @@ import {
   keyframes,
 } from '@angular/animations';
 import { CdkDragDrop } from '@angular/cdk/drag-drop'
+import { GauthService } from '../gauth.service';
 
 @Component({
   selector: 'app-current-dir',
@@ -19,8 +20,9 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop'
 
   ]
 })
-export class CurrentDirComponent implements OnInit, AfterContentInit {
-  constructor(public trackService: TrackServerService) { }
+export class CurrentDirComponent implements OnInit {
+  constructor(public trackService: TrackServerService,
+    public gauth: GauthService) { }
   @ViewChild("rootDir") rootDirForm!: ElementRef;
 
   // ANIMATION STATE AND TRIGGER FOR THE INPUT ELEMENT
@@ -41,82 +43,44 @@ export class CurrentDirComponent implements OnInit, AfterContentInit {
   }
 
   // IT IS ACTUALLY A DIRECTORY, NOT A TRACK BUT IT HAS THE id I NEED
-  goToDir(file: Track | null, direction: string): void {
+  async goToDir(file: Track | null, direction: string): Promise<void> {
     this.currentDirContents = [];
     if (file !== null && direction === "down") {
       this.trackService.previousDirIds.push(this.trackService.dirId);
+      this.trackService.currentDirContents = await this.gauth.getChildren(file.id) as Track[];
       this.trackService.dirId = file.id;
-      this.trackService.getDirectoryContents(file.id)
-        .subscribe((response) => {
-          this.processChildren(response.items);
-        })
+      this.trackService.dirAlert.emit();
     } else if (direction === "up") {
       const prev = this.trackService.previousDirIds.pop() as string;
       this.trackService.dirId = prev;
-      this.trackService.getDirectoryContents(prev)
-        .subscribe((response) => {
-          this.processChildren(response.items);
-        })
-    }
-  }
-
-  // CHILDREN ARE CONTENTS OF A FOLDER IN GOOGLE DRIVE
-  // BY DEFAULT THEY HAVE NO FILENAME WHICH HAS TO BE REQUESTED SEPARATELY
-  async processChildren(children: Track[]): Promise<void> {
-    this.trackService.currentDirContents = [];
-    if (children.length === 0) {
-      this.trackService.currentDirContents = [];
+      this.trackService.currentDirContents = await this.gauth.getChildren(prev) as Track[];
       this.trackService.dirAlert.emit();
-      // this.currentDirContents = this.trackService.currentDirContents;
-    } else {
-      children.forEach((child) => {
-        this.trackService.getTrackObject(child["id"], children.length);
-      })
-      // this.currentDirContents = this.trackService.currentDirContents;
     }
-    // TODO: FIGURE OUT HOW TO SORT FILES BY NAME - HELP REQUEST?
-    // GRAPHQL, API SERVICE, LIST OF POKEMON IDS CODE, REQUEST FOR EACH ID, REST FOLDER
   }
 
-  handleSubmit(): void {
-    this.trackService.findDirectoryId(this.rootDirForm.nativeElement.value)
-      .subscribe((response) => {
-        try {
-          this.rootDirForm.nativeElement.disabled = true;
-          console.log(response.files[0].id);
-          const rootDirId = response.files[0].id;
-          this.trackService.rootDirId = rootDirId;
-          this.trackService.dirId = rootDirId;
-          this.toggleWaiting();
-          this.trackService.getDirectoryContents(rootDirId)
-            .subscribe((response) => {
-              this.processChildren(response.items)
-            })
-        } catch {
-          window.alert('Directory not found on Google Drive!');
-          this.rootDirForm.nativeElement.disabled = false;
-          this.toggleWaiting();
-        }
-      })
-  }
-
-  
-
-  ngAfterContentInit(): void {
-    // window.alert("Please provide the name of your music directory on Google Drive");
-  }
+  async handleSubmit(): Promise<void> {
+    const input = this.rootDirForm.nativeElement;
+      try {
+        const root = await this.gauth.searchFile(input.value)
+        input.disabled = true;
+        console.log(root);
+        this.trackService.rootDirId = root.id;
+        this.trackService.dirId = root.id;
+        const children = await this.gauth.getChildren(root.id);
+        console.log(children);
+        this.trackService.currentDirContents = children as Track[];
+        this.trackService.dirAlert.emit();
+      } catch (error) {
+        console.log(error);
+        window.alert('Directory not found on Google Drive!');
+        input.value = "";
+        input.disabled = false;
+      }
+    }
 
   ngOnInit(): void {
     this.trackService.dirAlert.subscribe((event) => {
       this.currentDirContents = this.trackService.currentDirContents;
-      // this.playbackQueue = this.trackService.playbackQueue;
     })
-
-    // MVP CODE FOR CUSTOM SERVER
-    // this.trackService.getDirectory()
-    //   .subscribe((response) => {
-    //     console.log(response);
-    //     this.processChildren(response.items);
-    //   });
   }
 }

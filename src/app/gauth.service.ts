@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { file } from 'googleapis/build/src/apis/file';
 import { CLIENT_ID, API_KEY, SCOPES, DISCOVERY_DOC } from 'src/env';
+import { Track } from './track-server.service';
 
 // GOOGLE-BASED CODE
 declare const google: any;
@@ -46,7 +48,7 @@ export class GauthService {
     // maybeEnableButtons();
   }
 
-  handleAuthClick() {
+  async handleAuthClick() {
     this.tokenClient.callback = async (resp: any) => {
       if (resp.error !== undefined) {
         throw (resp);
@@ -100,6 +102,67 @@ export class GauthService {
         'Files:\n');
     console.log(output);
   }
+
+  async searchFile(name: string) {
+    let response;
+    try {
+      response = await gapi.client.drive.files.list({
+        'q': `name='${name}'`,
+        'fields': 'files(id, name)',
+        'spaces': 'drive'
+      })
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+    const files = response.result.files;
+    if (!files || files.length == 0) {
+      console.log('No files found');
+      return;
+    } else {
+      return response.result.files[0];
+    }
+  }
+
+  async getChildren(id: string) {
+    let response;
+    try {
+      response = await gapi.client.drive.files.list({
+        'q': `'${id}' in parents`,
+        'fields': 'files(id, name, mimeType)',
+        'spaces': 'drive'
+      })
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+    const files = response.result.files;
+    if (!files || files.length == 0) {
+      console.log('No files found');
+      return;
+    } else {
+      return this.filterAndSortCurrentDir(files);
+    }
+  }
+
+  filterAndSortCurrentDir(children: Track[]): Track[] {
+    const dirs = children.filter(element => element.mimeType === "application/vnd.google-apps.folder");
+    const tracks = children.filter(element => element.mimeType.slice(0, 5) === "audio");
+    function compare (a: Track, b: Track): number {
+      if (a.title < b.title) {
+        return -1
+      } else if (a.title > b.title) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+    dirs.sort(compare);
+    tracks.sort(compare);
+    return dirs.concat(tracks);
+  }
+
+
   // GOOGLE-BASED CODE
 
   createScript1(): void {

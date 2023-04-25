@@ -30,3 +30,7 @@ asl-google-signin-button {
 #gauth {
   position: relative;
 }
+
+#authorize_button {
+  z-index: 6;
+}

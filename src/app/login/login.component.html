@@ -10,8 +10,8 @@
 <!-- GOOGLE-BASED CODE -->
 <div id="gauth">
   <h1>Testing Google Auth</h1>
-  <button id="authorize_button" (click)="handleAuthClick()">Authorize</button>
-  <button id="signout_button" (click)="handleSignoutClick()">Sign Out</button>
-  <button (click)="listFiles()">Get files</button>
+  <button id="authorize_button" (click)="this.gauth.handleAuthClick()">Authorize</button>
+  <button id="signout_button" (click)="this.gauth.handleSignoutClick()">Sign Out</button>
+  <button (click)="this.gauth.listFiles()">Get files</button>
 </div>
 <!-- GOOGLE-BASED CODE -->

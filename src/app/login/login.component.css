@@ -39,19 +39,6 @@ video {
   min-height: 100%;
   z-index: -1;
   margin: 0px;
-  background: linear-gradient(45deg,#006ba6,#0496ff,#ffbc42,#d81159,#8f2d56);
-  background-size: 500% 500%;
-  animation: gradient-animation 60s ease infinite;
-}
-
-@keyframes gradient-animation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  background: rgb(255,188,66);
+  background: linear-gradient(45deg, rgba(255,188,66,1) 0%, rgba(216,17,89,1) 80%, rgba(143,45,86,1) 100%);
 }

@@ -3,10 +3,8 @@ import { file } from 'googleapis/build/src/apis/file';
 import { CLIENT_ID, API_KEY, SCOPES, DISCOVERY_DOC } from 'src/env';
 import { Track } from './track-server.service';
 
-// GOOGLE-BASED CODE
 declare const google: any;
 declare const gapi: any;
-// GOOGLE-BASED CODE
 
 @Injectable({
   providedIn: 'root'
@@ -30,12 +28,9 @@ export class GauthService {
   async initializeGapiClient() {
     await gapi.client.init({
       apiKey: API_KEY,
-      // discoveryDocs: [this.DISCOVERY_DOC],
       discoveryDocs: [DISCOVERY_DOC]
     });
     this.gapiInited = true;
-    // I DO NOT IMPLEMENT THIS - THE BUTTONS ARE ALWAYS VISIBLE
-    // maybeEnableButtons();
   }
 
   gisLoaded() {
@@ -45,7 +40,6 @@ export class GauthService {
       callback: '', // defined later
     });
     this.gisInited = true;
-    // maybeEnableButtons();
   }
 
   async handleAuthClick() {
@@ -53,9 +47,6 @@ export class GauthService {
       if (resp.error !== undefined) {
         throw (resp);
       }
-      // document.getElementById('signout_button').style.visibility = 'visible';
-      // document.getElementById('authorize_button').innerText = 'Refresh';
-      // await this.listFiles();
     };
 
     if (gapi.client.getToken() === null) {
@@ -73,9 +64,6 @@ export class GauthService {
     if (token !== null) {
       google.accounts.oauth2.revoke(token.access_token);
       gapi.client.setToken('');
-      // document.getElementById('content').innerText = '';
-      // document.getElementById('authorize_button').innerText = 'Authorize';
-      // document.getElementById('signout_button').style.visibility = 'hidden';
     }
   }
 
@@ -92,7 +80,6 @@ export class GauthService {
     }
     const files = response.result.files;
     if (!files || files.length == 0) {
-      // document.getElementById('content').innerText = 'No files found.';
       console.log('No files found');
       return;
     }
@@ -130,7 +117,8 @@ export class GauthService {
       response = await gapi.client.drive.files.list({
         'q': `'${id}' in parents`,
         'fields': 'files(id, name, mimeType)',
-        'spaces': 'drive'
+        'spaces': 'drive',
+        'pageSize': '500'
       })
     } catch (err) {
       console.log(err);
@@ -162,9 +150,43 @@ export class GauthService {
     return dirs.concat(tracks);
   }
 
+  async getFile(id: string) {
+    let response;
+    try {
+      response = await gapi.client.drive.files.get({
+        'fileId': `${id}`,
+        'alt': 'media'
+      })
+      return response;
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  }
 
-  // GOOGLE-BASED CODE
+  // TO KEEP BLOB LOGIC ON THE PLAYER USED FETCH INSTEAD OF API LIBRARY REQUEST
+  async fetchTrack(id: string) {
+    try {
+      const token = this.getToken();
+      return fetch(
+        `https://content.googleapis.com/drive/v3/files/${id}?alt=media&key=${API_KEY}`
+      , {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "audio/*"
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  }
 
+  getToken() {
+    const token = gapi.client.getToken();
+    return token.access_token;
+  }
+  
   createScript1(): void {
     const script1 = window.document.createElement('script');
     script1.type = 'text/javascript';

@@ -14,6 +14,7 @@ export interface Track {
   id: string;
   mimeType: string;
   name: string;
+  webContentLink: string;
 }
 
 @Injectable({

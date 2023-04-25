@@ -3,7 +3,7 @@ import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import * as jsmediatags from 'jsmediatags';
 import { TrackServerService } from '../track-server.service';
 import { Track } from '../track-server.service';
-import { API_KEY } from 'src/env';
+import { GauthService } from '../gauth.service';
 
 @Component({
   selector: 'app-player-view',
@@ -11,7 +11,8 @@ import { API_KEY } from 'src/env';
   styleUrls: ['./player-view.component.css']
 })
 export class PlayerViewComponent implements AfterViewInit {
-  constructor(private trackService: TrackServerService) { }
+  constructor(private trackService: TrackServerService,
+    private gauth: GauthService) { }
 
   // ViewChild and ElementRef ARE AN ANGULAR WAYS TO WRAP AND REFER TO DOM ELEMENTS
   // USING DOM SELECTORS DIRECTLY IS NOT FOR ANGULAR
@@ -37,55 +38,100 @@ export class PlayerViewComponent implements AfterViewInit {
   };
 
   // AUDIO ELEMENT CAN NOT FETCH TRACKS DIRECTLY BECAUSE IT DOES NOT SEND AUTH HEADERS
+
+  // const file = await service.files.get({
+  //   fileId: fileId,
+  //   alt: 'media',
+  // });
+
   async fetchTrack(fileId: string): Promise<void> {
-    // try {
-      const audioSource = this.sourceElement.nativeElement;
-      this.audioElement.nativeElement.pause();
-      // audioSource.src = "";
-      const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media&key=${API_KEY}`, {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
-          "Content-Type": "audio/*"
+    const audioSource = this.sourceElement.nativeElement;
+    this.audioElement.nativeElement.pause();
+
+    // START DOWNLOADING FILE TO A BLOB, CREATE A TECHNICAL URL FOR THE BLOB AND GIVE IT
+    // TO THE AUDIO SOURCE ELEMENT
+    const response = await this.gauth.fetchTrack(fileId);
+    const blob = await response?.blob();
+
+    if (blob) {
+      jsmediatags.read(blob, {
+        onSuccess: (result) => {
+          console.log(result);
+          const coverArt = this.coverArt.nativeElement;
+          this.info.artist = result.tags.artist!;
+          this.info.title = result.tags.title!;
+          // APPARENTLY SOME FILES CONTAIN IMAGE DATA AS WELL
+          // PARSING BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
+          const { data, format } = result.tags.picture!;
+          let base64String = "";
+          for (let i = 0; i < data.length; i++) {
+            base64String += String.fromCharCode(data[i]);
+          }
+          coverArt.src = `data:${format};base64,${window.btoa(base64String)}`;
+        },
+        onError: (error) => {
+          console.error(error);
         }
       });
-      console.log(result);
-      if (result.status === 503) {
-        throw new Error('Failed to fetch a track');
-      }
-      // START DOWNLOADING FILE TO A BLOB, CREATE A TECHNICAL URL FOR THE BLOB AND GIVE IT
-      // TO THE AUDIO SOURCE ELEMENT
-      const blob = await result.blob();
 
-      if (blob) {
-        jsmediatags.read(blob, {
-          onSuccess: (result) => {
-            console.log(result);
-            const coverArt = this.coverArt.nativeElement;
-            this.info.artist = result.tags.artist!;
-            this.info.title = result.tags.title!;
-            // APPARENTLY SOME FILES CONTAIN IMAGE DATA AS WELL
-            // PARSING BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
-            const { data, format } = result.tags.picture!;
-            let base64String = "";
-            for (let i = 0; i < data.length; i++) {
-              base64String += String.fromCharCode(data[i]);
-            }
-            coverArt.src = `data:${format};base64,${window.btoa(base64String)}`;
-          },
-          onError: (error) => {
-            console.error(error);
-          }
-        });
-
-        audioSource.src = URL.createObjectURL(blob);
-        // TODO: FIX LOAD ERROR OR HANDLE GOOGLE DRIVE THROTTLING (?)
-        audioSource.parentElement.load();
-        const audioElement = this.audioElement.nativeElement;
-        audioElement.addEventListener('canplay', (event: Event) => {
-          this.audioElement.nativeElement.play()
-        });
-      }
+      audioSource.src = URL.createObjectURL(blob);
+      audioSource.parentElement.load();
+      const audioElement = this.audioElement.nativeElement;
+      audioElement.addEventListener('canplay', (event: Event) => {
+        this.audioElement.nativeElement.play()
+      });
+    }
   }
+
+  // async fetchTrack(fileId: string): Promise<void> {
+  //   // try {
+  //     const audioSource = this.sourceElement.nativeElement;
+  //     this.audioElement.nativeElement.pause();
+  //     // audioSource.src = "";
+  //     const result = await fetch(`${this.trackService.baseUrl}/${fileId}?alt=media&key=${API_KEY}`, {
+  //       headers: {
+  //         "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+  //         "Content-Type": "audio/*"
+  //       }
+  //     });
+  //     console.log(result);
+  //     if (result.status === 503) {
+  //       throw new Error('Failed to fetch a track');
+  //     }
+  //     // START DOWNLOADING FILE TO A BLOB, CREATE A TECHNICAL URL FOR THE BLOB AND GIVE IT
+  //     // TO THE AUDIO SOURCE ELEMENT
+  //     const blob = await result.blob();
+
+  //     if (blob) {
+  //       jsmediatags.read(blob, {
+  //         onSuccess: (result) => {
+  //           console.log(result);
+  //           const coverArt = this.coverArt.nativeElement;
+  //           this.info.artist = result.tags.artist!;
+  //           this.info.title = result.tags.title!;
+  //           // APPARENTLY SOME FILES CONTAIN IMAGE DATA AS WELL
+  //           // PARSING BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
+  //           const { data, format } = result.tags.picture!;
+  //           let base64String = "";
+  //           for (let i = 0; i < data.length; i++) {
+  //             base64String += String.fromCharCode(data[i]);
+  //           }
+  //           coverArt.src = `data:${format};base64,${window.btoa(base64String)}`;
+  //         },
+  //         onError: (error) => {
+  //           console.error(error);
+  //         }
+  //       });
+
+  //       audioSource.src = URL.createObjectURL(blob);
+  //       // TODO: FIX LOAD ERROR OR HANDLE GOOGLE DRIVE THROTTLING (?)
+  //       audioSource.parentElement.load();
+  //       const audioElement = this.audioElement.nativeElement;
+  //       audioElement.addEventListener('canplay', (event: Event) => {
+  //         this.audioElement.nativeElement.play()
+  //       });
+  //     }
+  // }
 
   // REFERRING TO THE ELEMENTS IN THE HANDLERS TO MAKE SURE THEY ARE INITIALIZED AND NOT NULL
   async playPause(event: Event): Promise<void | null> {

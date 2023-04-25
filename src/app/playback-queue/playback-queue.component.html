@@ -4,7 +4,7 @@
   cdkDropListData="this.trackService.currentDirContents">
   <li class="track" *ngFor="let track of playbackQueue"
     [ngClass]="{'playing' : this.trackService.currentTrack.id === track.id}" cdkDrag>
-    <p>{{track.title}}</p>
+    <p>{{track.name}}</p>
     <img src="/assets/trash.svg" alt="trashcan" (click)="removeTrack(track.id)" />
   </li>
 </ul>

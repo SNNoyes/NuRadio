@@ -32,5 +32,10 @@ asl-google-signin-button {
 }
 
 #authorize_button {
+  background-color: lightcoral;
+  border-radius: 5px;
+  border: none;
+  color: white;
+  font-size: 2em;
   z-index: 6;
 }

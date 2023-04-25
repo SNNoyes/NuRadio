@@ -9,5 +9,4 @@ import { GauthService } from '../gauth.service';
 export class DashboardComponent {
   constructor(public gauth: GauthService) { }
 
-
 }

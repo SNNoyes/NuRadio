@@ -1,14 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { TrackServerService } from '../track-server.service';
 import { Track } from '../track-server.service';
-import {
-  trigger,
-  state,
-  style,
-  animate,
-  transition,
-  keyframes,
-} from '@angular/animations';
 import { CdkDragDrop } from '@angular/cdk/drag-drop'
 import { GauthService } from '../gauth.service';
 
@@ -24,12 +16,6 @@ export class CurrentDirComponent implements OnInit {
   constructor(public trackService: TrackServerService,
     public gauth: GauthService) { }
   @ViewChild("rootDir") rootDirForm!: ElementRef;
-
-  // ANIMATION STATE AND TRIGGER FOR THE INPUT ELEMENT
-  isWaiting = true;
-  toggleWaiting(): void {
-    this.isWaiting = !this.isWaiting;
-  }
 
   // TODO: REFACTOR AS currentDir IS ALSO ALLOWED TO DISPLAY FOLDERS 
   // SO Track TYPE IS NOT ENTIRELY CORRECT

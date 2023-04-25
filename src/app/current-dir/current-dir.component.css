@@ -43,14 +43,7 @@ label {
   margin-right: 5px;
 }
 
-/* @keyframes emphasis {
-  33% { transform: scale(1) }
-  66% { transform: scale(1.2) }
-  100% { transform: scale(1) }
-} */
-
 input {
-  /* animation: emphasis 1s 2; */
   border-radius: 5px;
   width: 100%;
 }

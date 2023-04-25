@@ -13,6 +13,7 @@ export class PlaybackQueueComponent implements OnInit {
 
   playbackQueue: Track[] = [];
 
+  // TODO: IMPLEMENT SELECTING A TRACK FROM THE QUEUE
   // selectTrack(fileName: string): void {
   //   this.trackService.nowPlaying = fileName;
   //   this.trackService.trackAlert.emit();

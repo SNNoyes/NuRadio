@@ -44,6 +44,16 @@ export class CurrentDirComponent implements OnInit {
     }
   }
 
+  checkForAudioFiles(): boolean {
+    return this.currentDirContents.find(element => element.mimeType.slice(0, 5) === 'audio') ? true : false;
+  }
+
+  addDirectoryToQueue(event: Event) {
+    const toAdd = this.currentDirContents.filter(element => element.mimeType.slice(0, 5) === 'audio');
+    this.trackService.playbackQueue.push(...toAdd);
+    this.trackService.queueAlert.emit();
+  }
+
   async handleSubmit(): Promise<void> {
     const input = this.rootDirForm.nativeElement;
       try {

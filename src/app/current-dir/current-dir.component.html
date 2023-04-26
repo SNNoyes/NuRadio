@@ -16,3 +16,7 @@
     <p>{{file.name}}</p>
   </li>
 </ul>
+<div id="circle" (click)="addDirectoryToQueue($event)"
+  *ngIf="this.currentDirContents.length > 0 && this.checkForAudioFiles()">
+  <img id="add-to-queue" src="/assets/plus.svg" alt="Add to queue" />
+</div>

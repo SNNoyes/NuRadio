@@ -186,5 +186,9 @@ export class PlayerViewComponent implements AfterViewInit {
     audioElement.addEventListener('pause', () => {
       this.playing = false;
     })
+    this.trackService.trackAlert.subscribe((event) => {
+      this.currentTrack = this.trackService.currentTrack;
+      this.fetchTrack(this.currentTrack.id);
+    })
   }
 }

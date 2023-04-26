@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { file } from 'googleapis/build/src/apis/file';
 import { CLIENT_ID, API_KEY, SCOPES, DISCOVERY_DOC } from 'src/env';
 import { Track } from './track-server.service';
 
+// PLACEHOLDER VARIABLES FOR THE SCRIPTS LOADED IN HTML
 declare const google: any;
 declare const gapi: any;
 
@@ -13,6 +13,7 @@ export class GauthService {
   constructor(
 
   ) { 
+    // LOADING HTML SCRIPTS
     this.createScript1();
     this.createScript2();
   }
@@ -69,29 +70,6 @@ export class GauthService {
       google.accounts.oauth2.revoke(token.access_token);
       gapi.client.setToken('');
     }
-  }
-
-  async listFiles() {
-    let response;
-    try {
-      response = await gapi.client.drive.files.list({
-        'pageSize': 10,
-        'fields': 'files(id, name)',
-      });
-    } catch (err) {
-      console.log(err);
-      return;
-    }
-    const files = response.result.files;
-    if (!files || files.length == 0) {
-      console.log('No files found');
-      return;
-    }
-    // Flatten to string to display
-    const output = files.reduce(
-        (str: any, file: any) => `${str}${file.name} (${file.id})\n`,
-        'Files:\n');
-    console.log(output);
   }
 
   async searchFile(name: string) {
@@ -173,8 +151,7 @@ export class GauthService {
     try {
       const token = this.getToken();
       return fetch(
-        `https://content.googleapis.com/drive/v3/files/${id}?alt=media&key=${API_KEY}`
-      , {
+        `https://content.googleapis.com/drive/v3/files/${id}?alt=media&key=${API_KEY}`, {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "audio/*"
@@ -191,6 +168,7 @@ export class GauthService {
     return token.access_token;
   }
   
+  // A WORKAROUND FOR LOADING SCRIPTS AS HTML ELEMENTS IN ANGULAR
   createScript1(): void {
     const script1 = window.document.createElement('script');
     script1.type = 'text/javascript';

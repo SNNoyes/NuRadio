@@ -14,10 +14,10 @@ export class PlaybackQueueComponent implements OnInit {
   playbackQueue: Track[] = [];
 
   // TODO: IMPLEMENT SELECTING A TRACK FROM THE QUEUE
-  // selectTrack(fileName: string): void {
-  //   this.trackService.nowPlaying = fileName;
-  //   this.trackService.trackAlert.emit();
-  // }
+  selectTrack(track: Track): void {
+    this.trackService.currentTrack = track;
+    this.trackService.trackAlert.emit();
+  }
 
   removeTrack(id: string): void {
     const tbdIndex = this.trackService.playbackQueue.findIndex(
@@ -42,6 +42,11 @@ export class PlaybackQueueComponent implements OnInit {
       [queue[a], queue[b]] = [queue[b], queue[a]];
       this.trackService.queueAlert.emit();
     }
+  }
+
+  clearQueue(event: Event) {
+    this.trackService.playbackQueue = [];
+    this.trackService.queueAlert.emit();
   }
 
   ngOnInit(): void {

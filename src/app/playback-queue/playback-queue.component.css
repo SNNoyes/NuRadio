@@ -51,3 +51,23 @@ p {
   margin: 0px;
   margin-left: 5px;
 }
+
+#clear-queue {
+  width: 40px;
+  height: 40px;
+  visibility: visible;
+}
+
+#circle {
+  width: 70px;
+  height: 70px;
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background-color: coral;
+  border-radius: 50%;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}

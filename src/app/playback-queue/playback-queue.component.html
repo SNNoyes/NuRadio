@@ -3,8 +3,12 @@
   cdkDropListConnectedTo="dir-list"
   cdkDropListData="this.trackService.currentDirContents">
   <li class="track" *ngFor="let track of playbackQueue"
-    [ngClass]="{'playing' : this.trackService.currentTrack.id === track.id}" cdkDrag>
+    [ngClass]="{'playing' : this.trackService.currentTrack.id === track.id}" cdkDrag
+    (click)="selectTrack(track)">
     <p>{{track.name}}</p>
     <img src="/assets/trash.svg" alt="trashcan" (click)="removeTrack(track.id)" />
   </li>
 </ul>
+<div id="circle" *ngIf="this.playbackQueue.length > 0" (click)="clearQueue($event)">
+  <img id="clear-queue" src="/assets/trash.svg" alt="Clear queue" />
+</div>

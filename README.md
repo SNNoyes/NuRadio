@@ -9,13 +9,13 @@ App features:
 * A choice of means to build a playback queue: add and remove tracks in batches or select tracks by click, use drag-and-drop to add and re-order tracks
 * Non-destructive scope: the app cannot modify or delete user files
 
-A short [video](https://youtu.be/bfb1Rm9EXqM) about this project.
+A short [video](https://youtu.be/bfb1Rm9EXqM) about this app.
 
 ![Screenshot](src/assets/DriveTracks.png)
 
 # Getting started
 
-The app uses Google Drive API and it is not published for now. To get hands-on with the app you will need a Google Developer account, a configured Google Cloud workspace, an API key and other credentials (you can start with this [guide](https://developers.google.com/workspace/guides/get-started)).
+The app uses Google Drive API and it is yet to go through verification and publishing process. If you want to get hands-on with the app before that, you need a Google Developer account, a configured Google Cloud workspace, an API key and other credentials (you can start with this [guide](https://developers.google.com/workspace/guides/get-started)).
 
 Provided you have the Google setup in place, to run the app:
 1. fork this repository and clone it

@@ -17,8 +17,6 @@ export class CurrentDirComponent implements OnInit {
     public gauth: GauthService) { }
   @ViewChild("rootDir") rootDirForm!: ElementRef;
 
-  // TODO: REFACTOR AS currentDir IS ALSO ALLOWED TO DISPLAY FOLDERS 
-  // SO Track TYPE IS NOT ENTIRELY CORRECT
   currentDirContents: Track[] = [];
 
   addToQueue(track: Track): void {
@@ -28,7 +26,6 @@ export class CurrentDirComponent implements OnInit {
     }
   }
 
-  // IT IS ACTUALLY A DIRECTORY, NOT A TRACK BUT IT HAS THE id I NEED
   async goToDir(file: Track | null, direction: string): Promise<void> {
     this.currentDirContents = [];
     if (file !== null && direction === "down") {

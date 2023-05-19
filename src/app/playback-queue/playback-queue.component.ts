@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TrackServerService } from '../track-server.service';
 import { Track } from '../track-server.service';
-import { CdkDragDrop } from '@angular/cdk/drag-drop'
+import { CdkDragDrop, CdkDragEnd } from '@angular/cdk/drag-drop'
 
 @Component({
   selector: 'app-playback-queue',
@@ -13,7 +13,6 @@ export class PlaybackQueueComponent implements OnInit {
 
   playbackQueue: Track[] = [];
 
-  // TODO: IMPLEMENT SELECTING A TRACK FROM THE QUEUE
   selectTrack(track: Track): void {
     this.trackService.currentTrack = track;
     this.trackService.trackAlert.emit();
@@ -27,7 +26,7 @@ export class PlaybackQueueComponent implements OnInit {
     this.trackService.queueAlert.emit();
   }
 
-  dropIntoPlaybackQueue(event: any) {
+  dropIntoPlaybackQueue(event: CdkDragDrop<any>) {
     if (event.previousContainer !== event.container) {
       if (this.trackService.currentDirContents[event.previousIndex]
         .mimeType.slice(0, 5) === 'audio') {

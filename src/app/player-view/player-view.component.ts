@@ -16,7 +16,6 @@ export class PlayerViewComponent implements AfterViewInit {
     private gauth: GauthService) { }
 
   // ViewChild and ElementRef ARE ANGULAR WAYS TO WRAP AND REFER TO DOM ELEMENTS
-  // USING DOM SELECTORS DIRECTLY IS NOT FOR ANGULAR
   @ViewChild("audio") audioElement!: ElementRef;
   @ViewChild("volume") volumeControl!: ElementRef;
   @ViewChild("progressBar") progressBar!: ElementRef;
@@ -51,8 +50,7 @@ export class PlayerViewComponent implements AfterViewInit {
           const coverArt = this.coverArt.nativeElement;
           this.info.artist = result.tags.artist!;
           this.info.title = result.tags.title!;
-          // APPARENTLY SOME FILES CONTAIN IMAGE DATA AS WELL
-          // PARSING BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
+          // PARSING COVER ART DATA BELOW AS ADVISED BY AUTHORS OF THE LIBRARY
           const { data, format } = result.tags.picture!;
           let base64String = "";
           for (let i = 0; i < data.length; i++) {

@@ -20,7 +20,7 @@ The app uses Google Drive API and it is yet to go through verification and publi
 Provided you have the Google setup in place, to run the app:
 1. fork this repository and clone it
 2. make sure that you have Node.js installed or install it and run `npm install` command from the project directory to install all the dependencies 
-3. create `env.ts` file in `src` directory and provide introduce necessary variables (or populate and rename `example_env.ts` file): 
+3. create `env.ts` file in `src` directory and provide necessary variables (or populate and rename `example_env.ts` file): 
 
 ```TypeScript
 export const API_KEY = "YOUR API KEY";
